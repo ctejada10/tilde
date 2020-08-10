@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Install command-line tools using Homebrew.
+
+# Install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+
+# Make sure we’re using the latest Homebrew.
+brew update
+
+# Upgrade any already-installed formulae.
+brew upgrade
+
+# Install all our dependencies with bundle (See Brewfile)
+brew tap homebrew/bundle
+brew bundle
+
+# Save Homebrew’s installed location.
+BREW_PREFIX=$(brew --prefix)
+
+# Remove outdated versions from the cellar.
+brew cleanup

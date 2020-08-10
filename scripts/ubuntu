@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+
+# Ask for the administrator password upfront
+sudo -v
+
+# Updating all the things
+sudo apt-get update; sudo apt-get upgrade
+
+source .apt
+source .stow

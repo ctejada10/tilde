@@ -1,0 +1,17 @@
+dotfiles/vim/.vim/bundle/
+dotfiles/keychain/
+dotfiles/ssh/.ssh/personal*
+dotfiles/ssh/.ssh/work*
+dotfiles/ssh/.ssh/known_hosts
+dotfiles/vim/.vim
+dotfiles/zsh/.zsh_history
+dotfiles/zsh/.zsh/cache
+dotfiles/gpg/.gnupg/*.d
+dotfiles/gpg/.gnupg/pub*.*
+dotfiles/gpg/.gnupg/rand*
+dotfiles/gpg/.gnupg/trust*
+dotfiles/gpg/.gnupg/.#*
+dotfiles/ssh/.ssh/environment*
+assets/assets*
+assets/com.googlecode.iterm2.plist
+assets/.zsh-history
