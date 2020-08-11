@@ -27,7 +27,7 @@
 	prompt = false
 
 [gpg]
-	program = /usr/local/bin/gpg
+	program = gpg
 
 [core]
 	excludesfile = /Users/ctejada/.gitignore_global
