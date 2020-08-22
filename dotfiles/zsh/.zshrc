@@ -38,10 +38,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Python VirtualEnvs
   source /usr/local/bin/virtualenvwrapper.sh
   # Plugins
-  plugins=(vi-mode git)
+  plugins=(git)
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # Plugins
-  plugins=(vi-mode git ssh-agent)
+  plugins=(git ssh-agent)
   zstyle :omz:plugins:ssh-agent identities personal
   # Launching tmux
   if [[ "$TMUX" == "" ]]; then
