@@ -21,3 +21,5 @@ alias subs='subliminal download -l'
 alias grep='grep --color=auto'
 
 alias mkdir='mkdir -p'
+
+alias plex='docker-compose -f /home/ctejada/plex/etc/docker/docker-compose.yaml'
