@@ -42,10 +42,14 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   plugins=(git)
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # Plugins
-  plugins=(git ssh-agent)
-  zstyle :omz:plugins:ssh-agent identities personal
+  plugins=(git)
   # Launching tmux
   if [[ "$TMUX" == "" ]]; then
     tmux attach -t base || tmux new -s base; exit
+  fi
+
+  if [ -z "$SSH_AUTH_SOCK" ] ; then
+    eval `ssh-agent -s`
+    ssh-add
   fi
 fi
