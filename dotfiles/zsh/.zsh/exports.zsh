@@ -17,9 +17,9 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export PATH="/opt/plex/bin:$PATH"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # PATH 
-  export PATH=$PATH:/Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin
+  export PATH="/Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin:$PATH"
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
-  export PATH=$PATH:/opt/boxen/homebrew/opt/go/libexec/bin
+  export PATH="/opt/boxen/homebrew/opt/go/libexec/bin:$PATH"
   export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
   # GPG
   export GPG_TTY=`tty`
