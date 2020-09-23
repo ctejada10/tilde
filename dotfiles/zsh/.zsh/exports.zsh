@@ -12,7 +12,10 @@ export EDITOR='vim'
 export LC_COLLATE=C
 export LC_ALL=C
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # Python virtual environments
+  export PATH="/opt/plex/bin:$PATH"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
   # PATH 
   export PATH=$PATH:/Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
