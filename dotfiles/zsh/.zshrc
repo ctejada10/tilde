@@ -36,8 +36,6 @@ compinit -d ~/src/tilde/assets
 bindkey -v
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  # Python VirtualEnvs
-  source /usr/local/bin/virtualenvwrapper.sh
   # Plugins
   plugins=(git)
 elif [[ "$OSTYPE" == "darwin"* ]]; then
