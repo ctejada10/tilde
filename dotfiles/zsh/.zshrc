@@ -31,8 +31,8 @@ source ~/.zsh/aliases.zsh
 source ~/.zsh/functions.zsh
 
 # History and completion management
-HISTFILE=~/src/tilde/assets/.zsh-history
-compinit -d ~/src/tilde/assets
+HISTFILE=~/repos/tilde/assets/.zsh-history
+compinit -d ~/repos/tilde/assets
 bindkey -v
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
