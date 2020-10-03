@@ -18,7 +18,7 @@ ZSH_THEME="minimal"
 HIST_STAMPS="dd/mm/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=~/src/tilde/assets
+ZSH_CUSTOM=~/repos/tilde/assets
 
 source $ZSH/oh-my-zsh.sh
 
