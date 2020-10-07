@@ -20,6 +20,7 @@ brew 'pkg-config' # https://github.com/driesvints/dotfiles/issues/20
 brew 'trash'      # Manage the Trash bin
 brew 'tree'       # List directories in a tree structure
 brew 'stow'
+brew 'svn'        # Some fonts need svn to install
 
 # Development
 brew 'python'
@@ -34,9 +35,11 @@ cask 'google-chrome'
 cask 'discord'
 cask 'flux'
 cask 'hazel'
+cask 'iterm2'
 cask 'maccy'
 cask 'setapp'
 cask 'skype'
+cask 'soundsource'
 cask 'slack'
 cask 'steam'
 cask 'telegram'
@@ -44,6 +47,7 @@ cask 'transmission'
 cask 'transmit'
 cask 'visual-studio-code'
 cask 'whatsapp'
+cask 'zoomus'
 cask 'zotero'
 
 # Quicklook
@@ -67,7 +71,4 @@ mas 'Numbers', id: 409203825
 mas 'Things', id: 904280696
 mas 'Canary Mail', id: 1236045954
 mas 'Magnet', id: 441258766
-mas 'Raindrop.io for Safari', id: 957810159
-mas 'PiPer', id: 1421915518
-mas 'Vimari', id: 1480933944
 mas 'GoodNotes 5', id: 1444383602
