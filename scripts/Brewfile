@@ -35,6 +35,7 @@ cask 'google-chrome'
 cask 'discord'
 cask 'flux'
 cask 'hazel'
+cask 'iina'
 cask 'iterm2'
 cask 'maccy'
 cask 'setapp'
@@ -64,6 +65,7 @@ cask 'font-source-code-pro-for-powerline'
 cask 'font-source-code-pro'
 cask 'font-source-sans-pro'
 cask 'font-source-serif-pro'
+cask 'font-latin-modern'
 
 # Mac App Store
 mas 'Keynote', id: 409183694
