@@ -21,6 +21,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
   export PATH="/opt/boxen/homebrew/opt/go/libexec/bin:$PATH"
   export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+  export PATH="/usr/local/sbin:$PATH"
   # GPG
   export GPG_TTY=`tty`
   # Brew autoupdate
