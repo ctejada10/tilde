@@ -18,7 +18,7 @@ ZSH_THEME="minimal"
 HIST_STAMPS="dd/mm/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=~/repos/tilde/assets
+ZSH_CUSTOM=~/src/tilde/assets
 
 source $ZSH/oh-my-zsh.sh
 
@@ -31,8 +31,8 @@ source ~/.zsh/aliases.zsh
 source ~/.zsh/functions.zsh
 
 # History and completion management
-HISTFILE=~/repos/tilde/assets/.zsh-history
-compinit -d ~/repos/tilde/assets
+HISTFILE=~/src/tilde/assets/.zsh-history
+compinit -d ~/src/tilde/assets
 bindkey -v
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
