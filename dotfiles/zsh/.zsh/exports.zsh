@@ -13,7 +13,6 @@ export LC_COLLATE=C
 export LC_ALL=C
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  # Python virtual environments
   export PATH="/opt/plex/bin:$PATH"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # PATH 
@@ -26,4 +25,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   export GPG_TTY=`tty`
   # Brew autoupdate
   export HOMEBREW_NO_AUTO_UPDATE=1
+  # Python virtual environments
+  export WORKON_HOME=$HOME/Dropbox/repos/.virtualenvs
+  export PROJECT_HOME=$HOME/src
 fi

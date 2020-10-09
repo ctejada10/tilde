@@ -37,6 +37,8 @@ bindkey -v
 plugins=(git)
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
+  # Python virtual environments
+  source /usr/local/bin/virtualenvwrapper.sh
   # Launching tmux
   if [[ "$TMUX" == "" ]]; then
     tmux attach -t base || tmux new -s base; exit
