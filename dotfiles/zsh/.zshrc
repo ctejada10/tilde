@@ -34,13 +34,9 @@ source ~/.zsh/functions.zsh
 HISTFILE=~/src/tilde/assets/.zsh-history
 compinit -d ~/src/tilde/assets
 bindkey -v
+plugins=(git)
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  # Plugins
-  plugins=(git)
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-  # Plugins
-  plugins=(git)
+if [[ "$OSTYPE" == "darwin"* ]]; then
   # Launching tmux
   if [[ "$TMUX" == "" ]]; then
     tmux attach -t base || tmux new -s base; exit
