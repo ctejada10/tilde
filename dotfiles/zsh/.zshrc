@@ -33,7 +33,15 @@ source ~/.zsh/functions.zsh
 # History and completion management
 HISTFILE=~/src/tilde/assets/.zsh-history
 compinit -d ~/src/tilde/assets
+
+# Vi mappings
 bindkey -v
+
+# Reverse and forward searches
+bindkey '^r' history-incremental-search-backward
+bindkey '^R' history-incremental-pattern-search-backward
+
+# Common plug-ins
 plugins=(git)
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
