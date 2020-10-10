@@ -26,6 +26,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   # Brew autoupdate
   export HOMEBREW_NO_AUTO_UPDATE=1
   # Python virtual environments
-  export WORKON_HOME=$HOME/Dropbox/repos/.virtualenvs
+  export WORKON_HOME=$HOME/src/.virtualenvs
   export PROJECT_HOME=$HOME/src
 fi

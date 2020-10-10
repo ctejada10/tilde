@@ -160,7 +160,7 @@ defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # Save screenshots to pictures/screenshots
-defaults write com.apple.screencapture location -string "${HOME}/Dropbox/tmp/screenshots/"
+defaults write com.apple.screencapture location -string '/Users/ctejada/Library/Mobile Documents/com~apple~CloudDocs/_tmp/media/screenshots'
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
 defaults write com.apple.screencapture type -string "png"
