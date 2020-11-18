@@ -12,6 +12,8 @@ dotfiles/gpg/.gnupg/rand*
 dotfiles/gpg/.gnupg/trust*
 dotfiles/gpg/.gnupg/.#*
 dotfiles/ssh/.ssh/environment*
+dotfiles/hyper/.hyper_plugins/*
 assets/assets*
 assets/com.googlecode.iterm2.plist
 assets/.zsh-history
+
