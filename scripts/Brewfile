@@ -6,52 +6,61 @@ tap 'homebrew/cask-versions'
 tap 'homebrew/bundle'
 
 # Binaries
-brew 'bash'       # Latest Bash version
-brew 'bat'        # "cat" on steroids
-brew 'coreutils'  # Those that come with macOS are outdated
-brew 'ffmpeg'
-brew 'git'
-brew 'gnupg2'
-brew 'grep'
-brew 'htop'
-brew 'httpie'
-brew 'mackup'
-brew 'mas'        # Mac App Store manager
-brew 'pkg-config' # https://github.com/driesvints/dotfiles/issues/20
-brew 'trash'      # Manage the Trash bin
-brew 'tree'       # List directories in a tree structure
-brew 'stow'
-brew 'svn'        # Some fonts need svn to install
-
-# Development
+brew "bash"
+brew "bat"
+brew "coreutils"
+brew "ffmpeg"
+brew "git"
+brew "gnupg"
+brew "grep"
+brew "htop"
+brew "httpie"
+brew "mackup"
+brew "mas"
+brew "pinentry-mac"
 brew 'python'
+brew "rclone"
+brew "speedtest-cli"
+brew "stow"
+brew "subversion"
+brew "tmux"
+brew "trash"
+brew "tree"
 
 # Apps
-cask 'aerial'
-cask 'alfred'
-cask 'authy'
-cask 'autodesk-fusion360'
-cask 'bartender'
-cask 'google-chrome'
-cask 'discord'
-cask 'flux'
-cask 'hazel'
-cask 'iina'
-cask 'iterm2'
-cask 'maccy'
-cask 'mactex-no-gui'
-cask 'rocket'
-cask 'skype'
-cask 'soundsource'
-cask 'slack'
-cask 'steam'
-cask 'telegram'
-cask 'transmission'
-cask 'transmit'
-cask 'visual-studio-code'
-cask 'whatsapp'
-cask 'zoomus'
-cask 'zotero'
+cask "adguard"
+cask "aerial"
+cask "alfred"
+cask "authy"
+cask "autodesk-fusion360"
+cask "backblaze"
+cask "discord"
+cask "dropbox"
+cask "flux"
+cask "hazel"
+cask "hyper"
+cask "iina"
+cask "iterm2"
+cask "maccy"
+cask "macmediakeyforwarder"
+cask "mactex-no-gui"
+cask "mendeley"
+cask "obsidian"
+cask "osxfuse"
+cask "private-internet-access"
+cask "rescuetime"
+cask "rocket"
+cask "skype"
+cask "slack"
+cask "soundsource"
+cask "steam"
+cask "telegram"
+cask "transmission"
+cask "transmit"
+cask "visual-studio-code"
+cask "whatsapp"
+cask "zoomus"
+cask "zotero"
 
 # Quicklook
 cask 'qlcolorcode'
@@ -59,15 +68,16 @@ cask 'qlmarkdown'
 cask 'quicklook-json'
 
 # Fonts
-cask 'font-lato'
-cask 'font-open-sans'
-cask 'font-jetbrains-mono'
-cask 'font-roboto'
-cask 'font-source-code-pro-for-powerline'
-cask 'font-source-code-pro'
-cask 'font-source-sans-pro'
-cask 'font-source-serif-pro'
-cask 'font-latin-modern'
+cask "font-iosevka"
+cask "font-jetbrains-mono"
+cask "font-latin-modern"
+cask "font-lato"
+cask "font-open-sans"
+cask "font-roboto"
+cask "font-source-code-pro"
+cask "font-source-code-pro-for-powerline"
+cask "font-source-sans-pro"
+cask "font-source-serif-pro"
 
 # Mac App Store
 mas 'Keynote', id: 409183694
@@ -76,3 +86,4 @@ mas 'Things', id: 904280696
 mas 'Canary Mail', id: 1236045954
 mas 'Magnet', id: 441258766
 mas 'GoodNotes 5', id: 1444383602
+mas 'Fantastical', id: 975937182
