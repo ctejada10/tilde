@@ -48,9 +48,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   # Python virtual environments
   source /usr/local/bin/virtualenvwrapper.sh
   # Launching tmux
-  if [[ "$TMUX" == "" ]]; then
-    tmux attach -t base || tmux new -s base; exit
-  fi
+  # if [[ "$TMUX" == "" ]]; then
+  #   tmux attach -t base || tmux new -s base; exit
+  # fi
 
   if [ -z "$SSH_AUTH_SOCK" ] ; then
     eval `ssh-agent -s`
