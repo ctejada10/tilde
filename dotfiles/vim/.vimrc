@@ -45,9 +45,6 @@ set linebreak    " Wrap lines at convenient points
 au Filetype python setlocal noexpandtab
 au Filetype python setlocal textwidth=70 " Wrap properly with any number of columns for Python files
 
-au Filetype tex,latex setlocal noexpandtab
-au Filetype tex,latex setlocal textwidth=70 " Wrap properly with any number of columns for Python files
-
 " ================ Folds ============================
 
 set foldmethod=indent   "fold based on indent
@@ -71,7 +68,6 @@ call vundle#begin()
   Plugin 'mattn/gist-vim'
   Plugin 'mattn/webapi-vim'
   Plugin 'tpope/vim-fugitive'
-  Plugin 'lervag/vimtex'
 
   " Super Searching
   "Plugin 'kien/ctrlp.vim'
@@ -81,9 +77,6 @@ call vundle#begin()
 
   " One plugin to rule them all
   Plugin 'sheerun/vim-polyglot'
-
-  " Gruvbox Colorscheme
-  Plugin 'morhetz/gruvbox'
 
   Plugin 'junegunn/goyo.vim'
   Plugin 'editorconfig/editorconfig-vim'
@@ -95,7 +88,7 @@ call vundle#end()
 
 let g:afterglow_blackout=1
 let g:afterglow_italic_comments=1
-colorscheme gruvbox
+set t_Co=16
 
 " ================ Hides ===========================
 
