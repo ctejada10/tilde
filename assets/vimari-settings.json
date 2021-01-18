@@ -3,7 +3,7 @@
   "linkHintCharacters": "asdfjklqwerzxc",
   "detectByCursorStyle": false,
   "scrollSize": 150,
-  "openTabUrl": "https://duckduckgo.com/",
+  "openTabUrl": "favorites://",
   "modifier": "",
   "smoothScroll": true,
   "scrollDuration": 25,
@@ -26,5 +26,6 @@
       "tabForward": "w",
       "tabBack": "q",
       "closeTab": "x",
+      "openTab": "t"
   }
 }
