@@ -8,13 +8,16 @@ tap "homebrew/core"
 # Binaries
 brew "bash"
 brew "bat"
+brew "python@3.9"
 brew "coreutils"
 brew "ffmpeg"
 brew "git"
+brew "git-flow-avh"
 brew "gnupg"
 brew "grep"
 brew "htop"
 brew "httpie"
+brew "jq"
 brew "mackup"
 brew "mas"
 brew "pinentry-mac"
@@ -26,43 +29,57 @@ brew "tmux"
 brew "trash"
 brew "tree"
 
-# Apps
+# Casks
+cask "1password"
 cask "adguard"
 cask "aerial"
 cask "agenda"
 cask "alfred"
+cask "arduino"
 cask "authy"
 cask "autodesk-fusion360"
 cask "backblaze"
+cask "devonthink"
 cask "discord"
 cask "dropbox"
+cask "dynalist"
 cask "flux"
-cask "google-chrome"
+cask "freedom"
+cask "google-drive"
+cask "hazel"
 cask "hyper"
 cask "iina"
 cask "iterm2"
+cask "little-snitch"
 cask "maccy"
 cask "macmediakeyforwarder"
 cask "mactex-no-gui"
-cask "mendeley"
+cask "messenger"
+cask "micro-snitch"
+cask "microsoft-auto-update"
+cask "microsoft-edge"
 cask "obsidian"
-cask "osxfuse"
+cask "omnifocus"
+cask "openinterminal"
 cask "plex"
 cask "preform"
 cask "private-internet-access"
+cask "quicklook-json"
 cask "rocket"
 cask "skype"
 cask "slack"
 cask "soundsource"
+cask "spotify"
 cask "steam"
 cask "telegram"
+cask "timing"
+cask "toggl-track"
 cask "transmission"
 cask "transmit"
 cask "ultimaker-cura"
 cask "visual-studio-code"
 cask "whatsapp"
 cask "zoom"
-cask "zoomus"
 cask "zotero"
 
 # Fonts
@@ -83,7 +100,7 @@ cask "font-source-serif-pro"
 # Quicklook Plugins
 cask "qlcolorcode"
 cask "qlmarkdown"
-cask "quicklook-json"
+cask "qlvideo"
 
 # Mac App Store
 mas 'Keynote', id: 409183694
@@ -92,4 +109,8 @@ mas 'Things', id: 904280696
 mas 'Magnet', id: 441258766
 mas 'GoodNotes 5', id: 1444383602
 mas 'Airmail 4', id: 918858936
-mas 'Deliveries', id: 290986013
+mas 'Deliveries', id: 29098601
+mas 'Reeder 5.', id: 1529448980
+mas 'Vimari', id: 1480933944
+mas 'Save to Raindrop.io', id: 1549370672
+mas 'PiPer', id: 1421915518
