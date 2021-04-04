@@ -1,5 +1,5 @@
 # Path to your dotfiles.
-export DOTFILES=~/src/tilde/dotfiles/zsh
+export DOTFILES=~/Dropbox/Repositories/tilde/dotfiles/zsh
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.omz
@@ -18,7 +18,7 @@ ZSH_THEME="minimal"
 HIST_STAMPS="dd/mm/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=~/src/tilde/assets
+ZSH_CUSTOM=~/Dropbox/Repositories/tilde/assets
 
 source $ZSH/oh-my-zsh.sh
 
