@@ -1,3 +1,6 @@
 [submodule "dotfiles/zsh/.omz"]
 	path = dotfiles/zsh/.omz
 	url = https://github.com/ohmyzsh/ohmyzsh.git
+[submodule "assets/git-flow-completion"]
+	path = assets/git-flow-completion
+	url = https://github.com/bobthecow/git-flow-completion
