@@ -37,7 +37,6 @@ cask "agenda"
 cask "alfred"
 cask "arduino"
 cask "authy"
-cask "autodesk-fusion360"
 cask "backblaze"
 cask "devonthink"
 cask "discord"
@@ -61,20 +60,17 @@ cask "obsidian"
 cask "omnifocus"
 cask "openinterminal"
 cask "plex"
-cask "preform"
 cask "private-internet-access"
 cask "quicklook-json"
 cask "rocket"
 cask "skype"
 cask "slack"
 cask "soundsource"
-cask "spotify"
 cask "steam"
 cask "telegram"
 cask "toggl-track"
 cask "transmission"
 cask "transmit"
-cask "ultimaker-cura"
 cask "visual-studio-code"
 cask "whatsapp"
 cask "zoom"
@@ -109,6 +105,5 @@ mas 'GoodNotes 5', id: 1444383602
 mas 'Airmail 4', id: 918858936
 mas 'Deliveries', id: 29098601
 mas 'Reeder 5.', id: 1529448980
-mas 'Vimari', id: 1480933944
 mas 'Save to Raindrop.io', id: 1549370672
 mas 'PiPer', id: 1421915518
