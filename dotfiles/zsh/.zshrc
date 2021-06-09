@@ -31,8 +31,8 @@ source ~/.zsh/aliases.zsh
 source ~/.zsh/functions.zsh
 
 # History and completion management
-HISTFILE=~/src/tilde/assets/.zsh-history
-compinit -d ~/src/tilde/assets
+HISTFILE=~/Repositories/tilde/assets/.zsh-history
+compinit -d ~/Repositories/tilde/assets
 
 # Vi mappings
 bindkey -v
@@ -42,15 +42,17 @@ bindkey '^r' history-incremental-search-backward
 bindkey '^R' history-incremental-pattern-search-backward
 
 # Common plug-ins
-plugins=(git)
+plugins=(git git-flow-completion)
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # Python virtual environments
   source /usr/local/bin/virtualenvwrapper.sh
   # Launching tmux
-  # if [[ "$TMUX" == "" ]]; then
-  #   tmux attach -t base || tmux new -s base; exit
-  # fi
+  if [[ "$TMUX" == "" ]]; then
+    if [[ "$TERM_PROGRAM" == "iTerm.app" ]]; then
+      tmux attach -t base || tmux new -s base; exit
+    fi
+  fi
 
   if [ -z "$SSH_AUTH_SOCK" ] ; then
     eval `ssh-agent -s`
