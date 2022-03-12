@@ -44,16 +44,19 @@ bindkey '^R' history-incremental-pattern-search-backward
 # Common plug-ins
 plugins=(git git-flow-completion)
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  # Python virtual environments
-  #source /usr/local/bin/virtualenvwrapper.sh
-  # Launching tmux
-  if [[ "$TMUX" == "" ]]; then
-    tmux attach -t base || tmux new -s base; exit
+# Python virtual environments
+# source /usr/local/bin/virtualenvwrapper.sh
+# Launching tmux
+if [[ -z "$TMUX" && -z "$INVOCATION_ID" ]] ; then
+  ID="$(tmux ls 2> /dev/null | grep -vm1 attached | cut -d: -f1)"
+  if [[ -z "$ID" ]] ; then
+      :
+  else
+      exec tmux attach-session -t "$ID"
   fi
+fi
 
-  if [ -z "$SSH_AUTH_SOCK" ] ; then
-    eval `ssh-agent -s`
-    ssh-add
-  fi
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+  eval `ssh-agent -s`
+  ssh-add
 fi
