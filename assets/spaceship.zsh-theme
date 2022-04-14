@@ -1,0 +1,1 @@
+/Users/ctejada/Repositories/tilde/assets/spaceship-prompt/spaceship.zsh-theme

@@ -13,7 +13,9 @@ export MNML_PROMPT=(mnml_git mnml_keymap)
 export MNML_RPROMPT=('mnml_cwd 20')
 
 # Terminal theme
-ZSH_THEME="minimal"
+ZSH_THEME="spaceship"
+# Hiding Vi-mode status
+SPACESHIP_VI_MODE_SHOW=false
 
 HIST_STAMPS="dd/mm/yyyy"
 
@@ -42,10 +44,11 @@ bindkey '^r' history-incremental-search-backward
 bindkey '^R' history-incremental-pattern-search-backward
 
 # Common plug-ins
-plugins=(git git-flow-completion)
+plugins=(git)
 
 # Python virtual environments
-# source /usr/local/bin/virtualenvwrapper.sh
+VIRTUALENVWRAPPER_PYTHON=/opt/homebrew/bin/python3
+source /opt/homebrew/bin/virtualenvwrapper.sh
 # Launching tmux
 if [[ -z "$TMUX" && -z "$INVOCATION_ID" ]] ; then
   ID="$(tmux ls 2> /dev/null | grep -vm1 attached | cut -d: -f1)"
