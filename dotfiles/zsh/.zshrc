@@ -13,7 +13,7 @@ export MNML_PROMPT=(mnml_git mnml_keymap)
 export MNML_RPROMPT=('mnml_cwd 20')
 
 # Terminal theme
-ZSH_THEME="spaceship"
+ZSH_THEME="minimal"
 # Hiding Vi-mode status
 SPACESHIP_VI_MODE_SHOW=false
 
