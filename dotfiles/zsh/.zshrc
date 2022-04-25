@@ -59,6 +59,13 @@ if [[ -z "$TMUX" && -z "$INVOCATION_ID" ]] ; then
   fi
 fi
 
+# Setting the right permisions for SSH-key (workaround for iCloud hosting)
+export PERSONAL=$(stat -f %A ~/.ssh/personal)
+if [ "$PERSONAL" -gt 400 ] ; then
+  chmod 400 ~/.ssh/personal
+fi
+
+# Launching SSH agent
 if [ -z "$SSH_AUTH_SOCK" ] ; then
   eval `ssh-agent -s`
   ssh-add
