@@ -46,6 +46,9 @@ bindkey '^R' history-incremental-pattern-search-backward
 # Common plug-ins
 plugins=(git)
 
+# Adding zoxide
+eval "$(zoxide init zsh)"
+
 # Python virtual environments
 VIRTUALENVWRAPPER_PYTHON=/opt/homebrew/bin/python3
 source /opt/homebrew/bin/virtualenvwrapper.sh
