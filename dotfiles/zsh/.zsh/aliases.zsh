@@ -25,3 +25,9 @@ alias mkdir='mkdir -p'
 alias plex='docker-compose -f /home/ctejada/plex/etc/docker/docker-compose.yaml'
 
 alias tmux='tmux -u'
+
+# Tools
+alias ls="exa"
+alias ll="exa -lh"
+alias lla="exa -alh"
+alias tree="exa --tree"
