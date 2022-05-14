@@ -25,5 +25,3 @@ alias mkdir='mkdir -p'
 alias plex='docker-compose -f /home/ctejada/plex/etc/docker/docker-compose.yaml'
 
 alias tmux='tmux -u'
-
-alias mount-google-drive='rclone cmount GDrive:/ /tmp/mounts --daemon'
