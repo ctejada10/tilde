@@ -21,7 +21,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
   export PATH="/opt/homebrew/bin:$PATH"
   export PATH="/usr/local/sbin:$PATH"
-  export PATH="$(yarn global bin):$PATH"
 
   # GPG
   export GPG_TTY=`tty`
@@ -30,6 +29,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   # Python virtual environments
   export WORKON_HOME=$HOME/Repositories/.virtualenvs
   export PROJECT_HOME=$HOME/Repositories
-  # Java
-  export PATH="/usr/local/opt/openjdk/bin:$PATH"
+  # Brew
+  export PATH="/opt/homebrew/sbin:$PATH"
 fi
