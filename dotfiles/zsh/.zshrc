@@ -1,5 +1,21 @@
-# Path to your dotfiles.
-export DOTFILES=~/Repositories/tilde/dotfiles/zsh
+# OS-specific settings
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # Dotfiles location
+  export DOTFILES=~/src/tilde/dotfiles/zsh
+  # ZSH Customs folder
+  ZSH_CUSTOM=~/src/tilde/assets
+  # History and completion management
+  HISTFILE=~/src/tilde/assets/.zsh-history
+  compinit -d ~/src/tilde/assets
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  # Dotfiles location
+  export DOTFILES=~/Repositories/tilde/dotfiles/zsh
+  # ZSH Customs folder
+  ZSH_CUSTOM=~/Repositories/tilde/assets
+  # History and completion management
+  HISTFILE=~/Repositories/tilde/assets/.zsh-history
+  compinit -d ~/Repositories/tilde/assets
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.omz
@@ -19,9 +35,6 @@ SPACESHIP_VI_MODE_SHOW=false
 
 HIST_STAMPS="dd/mm/yyyy"
 
-# Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=~/Repositories/tilde/assets
-
 source $ZSH/oh-my-zsh.sh
 
 # You may need to manually set your language environment
@@ -31,10 +44,6 @@ export LANG=en_US.UTF-8
 source ~/.zsh/exports.zsh
 source ~/.zsh/aliases.zsh
 source ~/.zsh/functions.zsh
-
-# History and completion management
-HISTFILE=~/Repositories/tilde/assets/.zsh-history
-compinit -d ~/Repositories/tilde/assets
 
 # Vi mappings
 bindkey -v
@@ -49,23 +58,12 @@ plugins=(git)
 # Adding zoxide
 eval "$(zoxide init zsh)"
 
-# Python virtual environments
-VIRTUALENVWRAPPER_PYTHON=/opt/homebrew/bin/python3
-source /opt/homebrew/bin/virtualenvwrapper.sh
-# Launching tmux
-if [[ -z "$TMUX" && -z "$INVOCATION_ID" ]] ; then
-  ID="$(tmux ls 2> /dev/null | grep -vm1 attached | cut -d: -f1)"
-  if [[ -z "$ID" ]] ; then
-      :
-  else
-      exec tmux attach-session -t "$ID"
-  fi
-fi
-
-# Setting the right permisions for SSH-key (workaround for iCloud hosting)
-export PERSONAL=$(stat -f %A ~/.ssh/personal)
-if [ "$PERSONAL" -gt 400 ] ; then
-  chmod 400 ~/.ssh/personal
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  ;
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  # Python virtual environments
+  VIRTUALENVWRAPPER_PYTHON=/opt/homebrew/bin/python3
+  source /opt/homebrew/bin/virtualenvwrapper.sh
 fi
 
 # Launching SSH agent
