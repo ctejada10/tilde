@@ -1,4 +1,4 @@
-dotfiles/vim/.vim/bundle/
+otfiles/vim/.vim/bundle/
 dotfiles/keychain/
 dotfiles/ssh/.ssh/personal*
 dotfiles/ssh/.ssh/work*
@@ -18,3 +18,4 @@ assets/.virtualenvs/*
 assets/assets*
 assets/com.googlecode.iterm2.plist
 assets/.zsh-history
+.DS_Store
