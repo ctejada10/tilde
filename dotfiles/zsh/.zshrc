@@ -17,8 +17,6 @@ ZSH_THEME="minimal"
 # Hiding Vi-mode status
 SPACESHIP_VI_MODE_SHOW=false
 
-HIST_STAMPS="dd/mm/yyyy"
-
 # Would you like to use another custom folder than $ZSH/custom?
 ZSH_CUSTOM=~/Repositories/tilde/assets
 
