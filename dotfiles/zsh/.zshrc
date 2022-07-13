@@ -1,3 +1,6 @@
+# Enable completions
+autoload -Uz compinit && compinit
+
 # OS-specific settings
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Dotfiles location
@@ -19,9 +22,6 @@ fi
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.omz
-
-# Enable completions
-autoload -Uz compinit && compinit
 
 # Minimal - Theme Settings
 export MNML_INSERT_CHAR=">"
