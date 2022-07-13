@@ -14,6 +14,7 @@ export LC_ALL=C
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export PATH="/opt/plex/bin:$PATH"
+  export PATH="/home/$USER/.local/bin:$PATH"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # PATH 
   export PATH="/Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin:$PATH"
