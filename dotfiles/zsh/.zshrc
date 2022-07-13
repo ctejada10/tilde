@@ -33,9 +33,6 @@ ZSH_THEME="minimal"
 # Hiding Vi-mode status
 SPACESHIP_VI_MODE_SHOW=false
 
-# Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=~/Repositories/tilde/assets
-
 source $ZSH/oh-my-zsh.sh
 
 # You may need to manually set your language environment
