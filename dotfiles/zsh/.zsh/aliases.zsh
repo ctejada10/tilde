@@ -22,9 +22,7 @@ alias grep='grep --color=auto'
 
 alias mkdir='mkdir -p'
 
-alias plex='docker-compose -f /home/ctejada/plex/etc/docker/docker-compose.yaml'
-
-alias tmux='tmux -u'
+alias tmux='tmux new-session -A -s main'
 
 # Tools
 alias ls="exa"
@@ -34,4 +32,3 @@ alias tree="exa --tree"
 alias cat="bat"
 alias cd="z"
 alias zz="z -"
-alias history="history -E"
