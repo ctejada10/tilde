@@ -1,0 +1,40 @@
+{
+	"name": "nord-light",
+	"displayName": "Nord Light",
+	"description": "Nord Light color theme",
+	"repository": "https://github.com/huytd/vscode-nord-light",
+	"icon": "icon.png",
+	"version": "0.1.1",
+	"publisher": "huytd",
+	"engines": {
+		"vscode": "^1.15.0"
+	},
+	"categories": [
+		"Themes"
+	],
+	"contributes": {
+		"themes": [
+			{
+				"label": "Nord Light",
+				"uiTheme": "vs",
+				"path": "./themes/Nord Light-color-theme.json"
+			},
+			{
+				"label": "Nord Light Brighter",
+				"uiTheme": "vs",
+				"path": "./themes/Nord Light Brighter-color-theme.json"
+			}
+		]
+	},
+	"__metadata": {
+		"id": "7aa98389-07cd-4c33-b912-50de62391fd3",
+		"publisherId": "0b66216d-5e91-4e88-96bf-1c53c0428af0",
+		"publisherDisplayName": "huytd",
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"updated": false,
+		"isPreReleaseVersion": false,
+		"installedTimestamp": 1675621753673,
+		"preRelease": false
+	}
+}
