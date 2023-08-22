@@ -22,7 +22,7 @@ alias grep='grep --color=auto'
 
 alias mkdir='mkdir -p'
 
-alias tmux='tmux new-session -A -s main'
+alias tmux='tmux -u new-session -A -s main'
 
 # Tools
 alias ls="exa"
