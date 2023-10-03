@@ -37,16 +37,12 @@ brew "jakehilborn/jakehilborn/displayplacer"
 # Casks
 cask "1password"
 cask "adguard"
-cask "airbuddy"
 cask "appcleaner"
 cask "arc"
 cask "backblaze"
-cask "betterdisplay"
-cask "bunch"
-cask "clicker-for-netflix"
+cask "command-tab-plus"
+cask "cron"
 cask "devonthink"
-cask "fantastical"
-cask "firefox"
 cask "flux"
 cask "hazel"
 cask "iina"
@@ -57,7 +53,6 @@ cask "macmediakeyforwarder"
 cask "mactex-no-gui"
 cask "nordvpn"
 cask "obsidian"
-cask "omnifocus"
 cask "postman"
 cask "raycast"
 cask "rectangle-pro"
@@ -70,7 +65,6 @@ cask "telegram"
 cask "transmit"
 cask "visual-studio-code"
 cask "zoom"
-cask "zotero"
 
 # Fonts
 cask "font-fira-code"
@@ -88,18 +82,19 @@ cask "font-source-sans-pro"
 cask "font-source-serif-pro"
 
 # Mac App Store
+mas '1Password for Safari', id: 1569813296
+mas 'Crouton: Cooking Companion', id:1461650987
+mas 'DaisyDisk', id:411643860
+mas 'Data Jar', id:1453273600
+mas 'Eat the Shorts for Safari', id: 1668012393
+mas 'Focused Work - Pomodoro Timer', id: 1523968394
 mas 'GoodNotes 5', id: 1444383602
-mas 'Deliveries', id: 29098601
-mas 'WaterMinder - Water Tracker', id: 1415257369
+mas 'Logger for Shortcuts', id: 1611554653
+mas 'NextDNS', id:1464122853
+mas 'Parcel - Delivery Tracking', id: 639968404
+mas 'Raivo Receiver', id:1498497896
+mas 'Sleeve for Spotify, Music', id:1606145041
 mas 'Timery for Toggl', id: 1425368544
-mas 'Crouton: Cooking Companion', id: 1461650987
-mas 'Data Jar', id: 1453273600
-mas 'Raivo Receiver' 1498497896
-mas 'Race Control' -2142124652
-mas 'Sleeve for Spotify, Music' 1606145041
-mas 'WaterMinder - Water Tracker' 1415257369
-mas 'NextDNS' 1464122853
-mas 'Eat the Shorts for Safari' 1668012393
-mas 'Crouton: Cooking Companion' 1461650987
-mas 'DaisyDisk' 411643860
-mas 'Xcode'497799835
+mas 'Vimari', id: 1480933944
+mas 'WaterMinder - Water Tracker', id: 1415257369
+mas 'Xcode', id:497799835
