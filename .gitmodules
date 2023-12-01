@@ -1,6 +1,3 @@
 [submodule "dotfiles/zsh/.omz"]
 	path = dotfiles/zsh/.omz
 	url = git@github.com:ohmyzsh/ohmyzsh.git
-[submodule "assets/spaceship-prompt"]
-	path = assets/spaceship-prompt
-	url = https://github.com/spaceship-prompt/spaceship-prompt.git
