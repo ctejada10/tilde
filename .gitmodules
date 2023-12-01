@@ -1,3 +1,0 @@
-[submodule "dotfiles/zsh/.omz"]
-	path = dotfiles/zsh/.omz
-	url = git@github.com:ohmyzsh/ohmyzsh.git
