@@ -414,6 +414,9 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 
 source .stow
 
+# Installing OMZ
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
 ###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################

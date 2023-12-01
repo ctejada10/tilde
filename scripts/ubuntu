@@ -9,3 +9,6 @@ sudo apt-get update; sudo apt-get upgrade
 
 source .apt
 source .stow
+
+# Installing OMZ
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
