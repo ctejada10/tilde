@@ -20,3 +20,4 @@ assets/com.googlecode.iterm2.plist
 assets/.zsh-history
 .DS_Store
 dotfiles/ipython/.ipython/profile_default/db/dhist
+/dotfiles/ipython/.ipython/profile_default/history.sqlite
