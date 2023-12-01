@@ -1,5 +1,5 @@
 # Installing useful binaries
-sudo apt-get install htop tree stow gpg python
+sudo apt-get install htop tree stow gpg python3 zoxide exa
 
 # Installing Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
