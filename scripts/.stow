@@ -6,5 +6,4 @@ stow -t ~ gpg
 stow -t ~ mackup
 stow -t ~ ssh
 stow -t ~ tmux
-stow -t ~ vim
 stow -t ~ zsh
