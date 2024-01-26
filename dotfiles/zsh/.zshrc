@@ -18,6 +18,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   # History and completion management
   HISTFILE=~/Repositories/tilde/assets/.zsh-history
   compinit -d ~/Repositories/tilde/assets
+  # Adding zoxide
+  eval "$(zoxide init zsh)"
 fi
 
 # Path to your oh-my-zsh installation.
@@ -52,8 +54,6 @@ bindkey '^R' history-incremental-pattern-search-backward
 # Common plug-ins
 plugins=(git)
 
-# Adding zoxide
-eval "$(zoxide init zsh)"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   ;
