@@ -21,7 +21,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # Path to your oh-my-zsh installation.
-export ZSH=$HOME/.omz
+export ZSH=$HOME/.oh-my-zsh
 
 # Minimal - Theme Settings
 export MNML_INSERT_CHAR=">"
