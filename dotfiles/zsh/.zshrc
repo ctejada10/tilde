@@ -50,7 +50,7 @@ bindkey '^r' history-incremental-search-backward
 bindkey '^R' history-incremental-pattern-search-backward
 
 # Common plug-ins
-plugins=(git)
+plugins=(git fzf-zsh-plugin)
 
 # Adding zoxide
 eval "$(zoxide init zsh)"

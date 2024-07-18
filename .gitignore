@@ -1,7 +1,6 @@
 otfiles/vim/.vim/bundle/
 dotfiles/keychain/
-dotfiles/ssh/.ssh/personal*
-dotfiles/ssh/.ssh/work*
+dotfiles/ssh/.ssh/arnor*
 dotfiles/ssh/.ssh/known_hosts
 dotfiles/ssh/.ssh/authorized_keys
 dotfiles/vim/.vim
@@ -22,3 +21,4 @@ assets/.zsh-history
 dotfiles/ipython/.ipython/profile_default/db/dhist
 /dotfiles/ipython/.ipython/profile_default/history.sqlite
 /dotfiles/zsh/.omz
+assets/plugins
