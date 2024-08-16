@@ -20,6 +20,6 @@ alias tmux='tmux -u new-session -A -s main'
 # Tools
 alias ls="eza"
 alias ll="eza -lh --icons"
-alias lla="eza -alh"
+alias lla="eza -alh --icons"
 alias tree="eza --tree"
 alias cat="bat"
