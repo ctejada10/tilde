@@ -18,8 +18,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   # History and completion management
   HISTFILE=~/Repositories/tilde/assets/.zsh-history
   compinit -d ~/Repositories/tilde/assets
-  # Adding zoxide
-  eval "$(zoxide init zsh)"
 fi
 
 # Path to your oh-my-zsh installation.
@@ -32,7 +30,6 @@ export MNML_RPROMPT=('mnml_cwd 20')
 
 # Terminal theme
 ZSH_THEME="minimal"
-# Hiding Vi-mode status
 
 source $ZSH/oh-my-zsh.sh
 
@@ -55,6 +52,7 @@ bindkey '^R' history-incremental-pattern-search-backward
 plugins=(git fzf-zsh-plugin)
 
 
+# Python Virtual Environments
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   ;
 elif [[ "$OSTYPE" == "darwin"* ]]; then
