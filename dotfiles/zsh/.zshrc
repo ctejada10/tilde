@@ -30,6 +30,7 @@ export MNML_RPROMPT=('mnml_cwd 20')
 
 # Terminal theme
 ZSH_THEME="minimal"
+# source "/opt/homebrew/opt/spaceship/spaceship.zsh"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -67,4 +68,5 @@ if [ -z "$SSH_AUTH_SOCK" ] ; then
   ssh-add
 fi
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# FZF setup
+source <(fzf --zsh)
