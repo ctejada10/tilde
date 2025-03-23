@@ -1,42 +1,35 @@
 # Taps
 tap "homebrew/bundle"
 tap "homebrew/services"
-tap "jakehilborn/jakehilborn"
 tap "koekeishiya/formulae"
 # Binaries
-brew "jpeg-xl"
-brew "aom"
 brew "bash"
 brew "bat"
+brew "btop"
+brew "icu4c@76"
 brew "pango"
 brew "librsvg"
 brew "chafa"
 brew "coreutils"
+brew "exiftool"
 brew "eza"
-brew "unbound"
 brew "gnutls"
-brew "libarchive"
-brew "libass"
-brew "libmicrohttpd"
-brew "librist"
-brew "tesseract"
 brew "ffmpeg"
 brew "fzf"
-brew "ghostscript"
 brew "git"
 brew "git-flow"
-brew "libassuan"
 brew "pinentry"
 brew "gnupg"
 brew "grep"
 brew "htop"
 brew "httpie"
-brew "mackup"
 brew "mas"
 brew "pinentry-mac"
+brew "poppler"
 brew "python@3.9"
 brew "rclone"
 brew "rmlint"
+brew "rsync"
 brew "stow"
 brew "tmux"
 brew "tree"
@@ -47,22 +40,23 @@ cask "1password"
 cask "1password-cli"
 cask "adguard"
 cask "adobe-creative-cloud"
-cask "aldente"
 cask "amethyst"
 cask "appcleaner"
 cask "backblaze"
-cask "command-tab-plus"
+cask "betterdisplay"
 cask "devonthink"
 cask "discord"
+cask "fantastical"
 cask "flux"
+cask "freedom"
 cask "hazel"
 cask "hyper"
 cask "iina"
 cask "latest"
-cask "little-snitch"
 cask "macmediakeyforwarder"
 cask "mactex-no-gui"
-cask "obsidian"
+cask "nordvpn"
+cask "omnifocus"
 cask "plexamp"
 cask "rar"
 cask "raycast"
@@ -88,37 +82,28 @@ cask "font-raleway"
 cask "font-roboto"
 cask "font-source-code-pro"
 cask "font-source-code-pro-for-powerline"
-# VSCode Plugins
-vscode "chouzz.vscode-better-align"
-vscode "esbenp.prettier-vscode"
-vscode "james-yu.latex-workshop"
-vscode "ms-azuretools.vscode-docker"
-vscode "ms-python.debugpy"
-vscode "ms-python.isort"
-vscode "ms-python.python"
-vscode "ms-python.vscode-pylance"
-vscode "ms-toolsai.jupyter-renderers"
-vscode "ms-vscode-remote.remote-ssh"
-vscode "ms-vscode-remote.remote-ssh-edit"
-vscode "ms-vscode.remote-explorer"
-vscode "njpwerner.autodocstring"
-vscode "streetsidesoftware.code-spell-checker"
-vscode "supperchong.pretty-json"
-vscode "teabyii.ayu"
-vscode "vscodevim.vim"
-vscode "yzhang.markdown-all-in-one"
 # Mac App Store
-mas '1Password for Safari', id: 1569813296
-mas 'DaisyDisk', id:411643860
-mas 'Data Jar', id:1453273600
-mas 'Eat the Shorts for Safari', id: 1668012393
-mas 'GoodLinks', id: 1474335294
-mas 'Logger for Shortcuts', id: 1611554653
-mas 'NextDNS', id:1464122853
-mas 'Parcel - Delivery Tracking', id: 639968404
-mas 'Play: Save Videos Watch Later', id: 1596506190
-mas 'Raivo Receiver', id:1498497896
-mas 'Sleeve for Spotify, Music', id:1606145041
-mas 'Shortery', id: 1594183810
-mas 'Timery for Toggl', id: 1425368544
-mas 'Things 3', id: 904280696
+mas "1Password for Safari", id: 1569813296
+mas "Actions", id: 1586435171
+mas "Bear", id: 1091189122
+mas "DaisyDisk", id: 411643860
+mas "Data Jar", id: 1453273600
+mas "Flighty", id: 1358823008
+mas "GoodLinks", id: 1474335294
+mas "Infuse", id: 1136220934
+mas "Keynote", id: 409183694
+mas "Logger", id: 1611554653
+mas "Menu Box", id: 6463440793
+mas "MusicBox", id: 1614730313
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Parcel", id: 639968404
+mas "PiPifier", id: 1160374471
+mas "Play", id: 1596506190
+mas "Raivo OTP", id: 1498497896
+mas "Shortery", id: 1594183810
+mas "Sleeve", id: 1606145041
+mas "Things", id: 904280696
+mas "Timery", id: 1425368544
+mas "Userscripts-Mac-App", id: 1463298887
+mas "WaterMinder", id: 1415257369

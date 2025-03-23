@@ -17,11 +17,11 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export PATH="/home/$USER/.local/bin:$PATH"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # PATH 
+  export PATH="$HOME/bin:$PATH" # Custom binaries
   export PATH="/Library/TeX/Distributions/.DefaultTeX/Contents/Programs/texbin:$PATH"
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
   export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
   export PATH="/opt/homebrew/bin:$PATH"
-  export PATH="/usr/local/sbin:$PATH"
 
   # GPG
   export GPG_TTY=`tty`
