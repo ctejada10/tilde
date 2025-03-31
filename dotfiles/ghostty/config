@@ -1,0 +1,28 @@
+# Ghostty Configuration File
+# Automatically created at:
+#   /Users/ctejada/Library/Application Support/com.mitchellh.ghostty/config
+#
+# To see a full list of options and their defaults, run:
+#   ghostty +show-config --default --docs
+# More details: https://ghostty.org/docs/config
+
+# ────── Theme & Appearance ──────
+theme = ayu_light
+font-size = 14	
+cursor-style = block
+
+# ────── Window Layout ──────
+window-padding-x = 10,15
+window-padding-y = 8,10
+macos-titlebar-proxy-icon = hidden
+title = " "
+window-colorspace = "display-p3"
+
+# ────── Behavior & Clipboard ──────
+copy-on-select = clipboard
+confirm-close-surface = false
+
+# ────── Custom Startup Command ──────
+# The following command is run when Ghostty starts.
+# Use this to execute a custom script or command during startup.
+command = /Users/ctejada/Library/Mobile\ Documents/com~apple~CloudDocs/Repositories/tilde/scripts/ghostty.sh
