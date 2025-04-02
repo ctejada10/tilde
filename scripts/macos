@@ -445,4 +445,7 @@ for app in "Activity Monitor" \
 	"iCal"; do
 	killall "${app}" &> /dev/null
 done
+
+ln -sf ~/Repositories/tilde/dotfiles/ghostty/config /Users/ctejada/Library/Application\ Support/com.mitchellh.ghostty/config
+
 echo "Done. Note that some of these changes require a logout/restart to take effect."

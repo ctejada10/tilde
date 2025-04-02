@@ -3,17 +3,14 @@ tap "homebrew/bundle"
 tap "homebrew/services"
 tap "koekeishiya/formulae"
 # Binaries
-brew "bash"
 brew "bat"
 brew "btop"
-brew "icu4c@76"
-brew "pango"
 brew "librsvg"
 brew "chafa"
 brew "coreutils"
-brew "exiftool"
 brew "eza"
 brew "gnutls"
+brew "librist"
 brew "ffmpeg"
 brew "fzf"
 brew "git"
@@ -21,11 +18,8 @@ brew "git-flow"
 brew "pinentry"
 brew "gnupg"
 brew "grep"
-brew "htop"
-brew "httpie"
 brew "mas"
 brew "pinentry-mac"
-brew "poppler"
 brew "python@3.9"
 brew "rclone"
 brew "rmlint"
@@ -42,31 +36,24 @@ cask "adguard"
 cask "adobe-creative-cloud"
 cask "amethyst"
 cask "appcleaner"
-cask "backblaze"
 cask "betterdisplay"
 cask "devonthink"
 cask "discord"
 cask "fantastical"
 cask "flux"
 cask "freedom"
+cask "ghostty"
 cask "hazel"
-cask "hyper"
 cask "iina"
-cask "latest"
 cask "macmediakeyforwarder"
 cask "mactex-no-gui"
-cask "nordvpn"
-cask "omnifocus"
-cask "plexamp"
 cask "rar"
 cask "raycast"
+cask "rectangle-pro"
 cask "rocket"
-cask "soundsource"
 cask "tailscale"
-cask "tower"
-cask "transmit"
+cask "todoist"
 cask "visual-studio-code"
-cask "vlc"
 cask "zoom"
 # Fonts
 cask "font-fira-code"
@@ -90,6 +77,7 @@ mas "DaisyDisk", id: 411643860
 mas "Data Jar", id: 1453273600
 mas "Flighty", id: 1358823008
 mas "GoodLinks", id: 1474335294
+mas "Goodnotes", id: 1444383602
 mas "Infuse", id: 1136220934
 mas "Keynote", id: 409183694
 mas "Logger", id: 1611554653
@@ -103,7 +91,6 @@ mas "Play", id: 1596506190
 mas "Raivo OTP", id: 1498497896
 mas "Shortery", id: 1594183810
 mas "Sleeve", id: 1606145041
-mas "Things", id: 904280696
 mas "Timery", id: 1425368544
 mas "Userscripts-Mac-App", id: 1463298887
 mas "WaterMinder", id: 1415257369
