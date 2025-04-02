@@ -47,6 +47,7 @@ cask "hazel"
 cask "iina"
 cask "macmediakeyforwarder"
 cask "mactex-no-gui"
+cask mimestream
 cask "rar"
 cask "raycast"
 cask "rectangle-pro"
