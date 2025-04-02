@@ -8,12 +8,16 @@
 
 # ────── Theme & Appearance ──────
 theme = ayu_light
-font-size = 14	
 cursor-style = block
 
+# ────── Text Settings ──────
+font-family = FiraCode Nerd Font Mono, MonoLisa
+font-size = 13
+font-style = Light
+
 # ────── Window Layout ──────
-window-padding-x = 10,15
-window-padding-y = 8,10
+window-padding-x = 15,18
+window-padding-y = 8,7
 macos-titlebar-proxy-icon = hidden
 title = " "
 window-colorspace = "display-p3"
@@ -23,6 +27,6 @@ copy-on-select = clipboard
 confirm-close-surface = false
 
 # ────── Custom Startup Command ──────
-# The following command is run when Ghostty starts.
-# Use this to execute a custom script or command during startup.
+# The following command is executed when Ghostty starts.
+# Use this to run a custom script or command during startup.
 command = /Users/ctejada/Library/Mobile\ Documents/com~apple~CloudDocs/Repositories/tilde/scripts/ghostty.sh
