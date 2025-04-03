@@ -447,5 +447,6 @@ for app in "Activity Monitor" \
 done
 
 ln -sf ~/Repositories/tilde/dotfiles/ghostty/config /Users/ctejada/Library/Application\ Support/com.mitchellh.ghostty/config
+mkdir -p ~/Downloads/Documents ~/Downloads/Media/Images ~/Downloads/Media/Videos
 
 echo "Done. Note that some of these changes require a logout/restart to take effect."
