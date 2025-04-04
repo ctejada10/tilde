@@ -22,6 +22,8 @@ echo "Installing Xcode Command Line Tools."
 xcode-select --install
 
 source .brew
+# Install ohmyzsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 ###############################################################################
 # OS Settings                                                                 #
