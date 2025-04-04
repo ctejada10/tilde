@@ -1,12 +1,20 @@
+// filepath: /Users/ctejada/Repositories/tilde/scripts/.brew
 #!/usr/bin/env bash
 
 # Install command-line tools using Homebrew.
 
-# Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+# Check if Homebrew is installed
+if ! command -v brew &> /dev/null; then
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+else
+  echo "Homebrew is already installed"
+fi
 
+BREW_PREFIX=$(brew --prefix)
+export PATH="$BREW_PREFIX/bin:$PATH"
 
-# Make sure we’re using the latest Homebrew.
+# Make sure we're using the latest Homebrew.
 brew update
 
 # Upgrade any already-installed formulae.
@@ -15,9 +23,6 @@ brew upgrade
 # Install all our dependencies with bundle (See Brewfile)
 brew tap homebrew/bundle
 brew bundle
-
-# Save Homebrew’s installed location.
-BREW_PREFIX=$(brew --prefix)
 
 # Remove outdated versions from the cellar.
 brew cleanup
