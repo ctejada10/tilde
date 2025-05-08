@@ -1,4 +1,3 @@
-// filepath: /Users/ctejada/Repositories/tilde/scripts/.brew
 #!/usr/bin/env bash
 
 # Install command-line tools using Homebrew.
@@ -22,7 +21,7 @@ brew upgrade
 
 # Install all our dependencies with bundle (See Brewfile)
 brew tap homebrew/bundle
-brew bundle
+brew bundle --file="$(dirname "$0")/Brewfile"
 
 # Remove outdated versions from the cellar.
 brew cleanup
