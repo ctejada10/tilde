@@ -3,7 +3,6 @@
 cd ../dotfiles
 stow -t ~ git
 stow -t ~ gpg
-stow -t ~ mackup
 stow -t ~ ssh
 stow -t ~ tmux
 stow -t ~ zsh
