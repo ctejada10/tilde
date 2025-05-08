@@ -21,7 +21,7 @@ echo "Installing Xcode Command Line Tools."
 # Install Xcode command line tools
 xcode-select --install
 
-source .brew
+source ~/Repositories/tilde/scripts/.brew
 # Install ohmyzsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
@@ -418,6 +418,19 @@ source .stow
 
 # Installing OMZ
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+###############################################################################
+# Hide unused directories from ~                                              #
+###############################################################################
+
+chflags hidden ~/Music
+chflags hidden ~/Databases
+chflags hidden ~/.DS_Store
+chflags hidden ~/Pictures
+chflags hidden ~/Library
+chflags hidden ~/Public
+chflags hidden ~/Movies
+chflags hidden ~/Applications
 
 ###############################################################################
 # Kill affected applications                                                  #
