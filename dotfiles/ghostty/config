@@ -29,4 +29,4 @@ confirm-close-surface = false
 # ────── Custom Startup Command ──────
 # The following command is executed when Ghostty starts.
 # Use this to run a custom script or command during startup.
-command = /Users/ctejada/Library/Mobile\ Documents/com~apple~CloudDocs/Repositories/tilde/scripts/ghostty.sh
+command = ~/Repositories/tilde/scripts/ghostty.sh
