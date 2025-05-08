@@ -18,7 +18,9 @@ OS=$(uname)
 SCRIPT_DIR="$TARGET_DIR/scripts"
 
 if [ "$OS" = "Darwin" ]; then
-    echo "macOS detected. Executing macOS setup script..."
+    echo "macOS detected. Installing Xcode command line tools..."
+    xcode-select --install
+    echo "Executing macOS setup script..."
     bash "$SCRIPT_DIR/macos"
 elif [ "$OS" = "Linux" ]; then
     echo "Linux detected. Executing Linux setup script..."
