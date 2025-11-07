@@ -1,9 +1,23 @@
 #!/usr/bin/env bash
-REPO_URL="https://github.com/ctejada10/tilde.git"
-TARGET_DIR="$HOME/Repositories/tilde"
 
-# Ensure ~/Repositories exists
-[ -d "$HOME/Repositories" ] || mkdir -p "$HOME/Repositories"
+REPO_URL="https://github.com/ctejada10/tilde.git"
+
+# Detect operating system early to determine clone location
+OS=$(uname)
+
+if [ "$OS" = "Darwin" ]; then
+    BASE_DIR="$HOME/Repositories"
+elif [ "$OS" = "Linux" ]; then
+    BASE_DIR="$HOME/src"
+else
+    echo "OS not recognized: $OS. Exiting."
+    exit 1
+fi
+
+TARGET_DIR="$BASE_DIR/tilde"
+
+# Ensure base dir exists
+[ -d "$BASE_DIR" ] || mkdir -p "$BASE_DIR"
 
 # Clone repository if not already cloned
 if [ ! -d "$TARGET_DIR" ]; then
@@ -13,8 +27,6 @@ else
     echo "Repository already exists at $TARGET_DIR, skipping clone."
 fi
 
-# Detect operating system
-OS=$(uname)
 SCRIPT_DIR="$TARGET_DIR/scripts"
 
 if [ "$OS" = "Darwin" ]; then
@@ -24,9 +36,5 @@ if [ "$OS" = "Darwin" ]; then
     bash "$SCRIPT_DIR/macos"
 elif [ "$OS" = "Linux" ]; then
     echo "Linux detected. Executing Ubuntu setup script..."
-    # Ensure the ubuntu script runs from the scripts directory so relative sources work
     (cd "$SCRIPT_DIR" && bash ./ubuntu)
-else
-    echo "OS not recognized: $OS. Exiting."
-    exit 1
 fi
