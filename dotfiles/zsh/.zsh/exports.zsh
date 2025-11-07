@@ -15,6 +15,9 @@ export LC_ALL=C
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export PATH="/opt/plex/bin:$PATH"
   export PATH="/home/$USER/.local/bin:$PATH"
+  # Python virtual environments
+  export WORKON_HOME=$HOME/src/.virtualenvs
+  export PROJECT_HOME=$HOME/src
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # PATH 
   export PATH="$HOME/bin:$PATH" # Custom binaries
