@@ -55,7 +55,8 @@ plugins=(git)
 
 # Python Virtual Environments
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  ;
+  VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+  source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   # Python virtual environments
   VIRTUALENVWRAPPER_PYTHON=/opt/homebrew/bin/python3

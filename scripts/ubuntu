@@ -40,7 +40,7 @@ fi
 
 # Link dotfiles safely as the target user (to target their HOME)
 echo "Linking dotfiles for $TARGET_USER using stow..."
-sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" bash ./.stow
+sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" 
 
 # Set default shell to zsh for the target user if not already
 ZSH_PATH="$(command -v zsh)"
