@@ -1,8 +1,67 @@
 #!/usr/bin/env bash
 
-cd ../dotfiles
-stow -t ~ git
-stow -t ~ gpg
-stow -t ~ ssh
-stow -t ~ tmux
-stow -t ~ zsh
+# Robust stow runner
+# - Backs up any existing files that would conflict with stow
+# - Accepts package names as arguments, defaults to a common set
+
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+DOTFILES_DIR="$REPO_DIR/dotfiles"
+TARGET_DIR="$HOME"
+
+timestamp() { date +"%Y%m%d-%H%M%S"; }
+
+usage() {
+  echo "Usage: $(basename "$0") [package ...]"
+  echo "If no packages are provided, defaults to: git gpg ssh tmux zsh"
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+# Properly handle default package list as an array
+if [[ $# -gt 0 ]]; then
+  packages=("$@")
+else
+  packages=(git gpg ssh tmux zsh)
+fi
+
+cd "$DOTFILES_DIR"
+
+# Create backup dir
+BACKUP_DIR="$REPO_DIR/scripts/stow-backups/$(timestamp)"
+mkdir -p "$BACKUP_DIR"
+
+echo "Backing up conflicts to: $BACKUP_DIR"
+
+# For each package, find files that would be created and move existing ones to backup
+for pkg in "${packages[@]}"; do
+  echo "Processing package: $pkg"
+  pkg_dir="$DOTFILES_DIR/$pkg"
+  if [[ ! -d "$pkg_dir" ]]; then
+    echo "Warning: package dir not found: $pkg_dir — skipping"
+    continue
+  fi
+
+  # Find all files and symlinks (skip the package root itself)
+  while IFS= read -r -d '' src; do
+    rel_path="${src#"$pkg_dir"/}"
+    dest="$TARGET_DIR/$rel_path"
+
+    # If destination exists (file or symlink), back it up
+    if [[ -e "$dest" || -L "$dest" ]]; then
+      backup_path="$BACKUP_DIR/$pkg/$rel_path"
+      mkdir -p "$(dirname "$backup_path")"
+      echo "Backing up $dest -> $backup_path"
+      mv -f "$dest" "$backup_path"
+    fi
+  done < <(find "$pkg_dir" -mindepth 1 \( -type f -o -type l \) -print0)
+
+  # Now run stow for the package
+  stow -v -t "$TARGET_DIR" "$pkg"
+done
+
+echo "Done. Backups are in: $BACKUP_DIR"

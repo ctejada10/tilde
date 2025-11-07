@@ -1,14 +1,61 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+# Always operate relative to this script's directory so relative sources work
+cd "$(dirname "$0")"
 
 # Ask for the administrator password upfront
 sudo -v
 
-# Updating all the things
-sudo apt-get update; sudo apt-get upgrade
+# Updating all the things (non-interactive)
+sudo apt-get update
+sudo apt-get -y upgrade
 
+# Install base packages and tooling
 source .apt
-source .stow
 
-# Installing OMZ
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# Determine target (non-root) user for per-user installs (Oh My Zsh, stow links)
+TARGET_USER="${SUDO_USER:-${USER}}"
+TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6 || true)"
+if [[ -z "$TARGET_HOME" ]]; then
+	# Fallback if getent not available
+	TARGET_HOME="$(eval echo ~"$TARGET_USER")"
+fi
+
+# Ensure 'bat' command is available on Debian/Ubuntu where the binary is 'batcat'
+if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
+	sudo ln -sf "$(command -v batcat)" /usr/local/bin/bat
+fi
+
+# Install Oh My Zsh idempotently for the target user without changing shell or auto-running
+ZSH_DIR="$TARGET_HOME/.oh-my-zsh"
+if [[ -d "$ZSH_DIR" ]]; then
+	echo "Oh My Zsh already installed at $ZSH_DIR"
+else
+	echo "Installing Oh My Zsh for $TARGET_USER..."
+	sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+		sh -c 'curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'
+fi
+
+# Link dotfiles safely as the target user (to target their HOME)
+echo "Linking dotfiles for $TARGET_USER using stow..."
+sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" bash ./.stow
+
+# Set default shell to zsh for the target user if not already
+ZSH_PATH="$(command -v zsh)"
+if [[ -n "$ZSH_PATH" ]]; then
+	CURRENT_SHELL="$(getent passwd "$TARGET_USER" | cut -d: -f7 || echo "")"
+	if [[ "$CURRENT_SHELL" != "$ZSH_PATH" ]]; then
+		if grep -qxF "$ZSH_PATH" /etc/shells; then
+			echo "Changing default shell for $TARGET_USER to $ZSH_PATH"
+			sudo chsh -s "$ZSH_PATH" "$TARGET_USER"
+		else
+			echo "Warning: $ZSH_PATH not found in /etc/shells; skipping automatic shell change."
+		fi
+	else
+		echo "Default shell for $TARGET_USER is already zsh."
+	fi
+else
+	echo "Warning: zsh not found on PATH; cannot set default shell."
+fi

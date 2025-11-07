@@ -23,8 +23,9 @@ if [ "$OS" = "Darwin" ]; then
     echo "Executing macOS setup script..."
     bash "$SCRIPT_DIR/macos"
 elif [ "$OS" = "Linux" ]; then
-    echo "Linux detected. Executing Linux setup script..."
-    bash "$SCRIPT_DIR/linux"
+    echo "Linux detected. Executing Ubuntu setup script..."
+    # Ensure the ubuntu script runs from the scripts directory so relative sources work
+    (cd "$SCRIPT_DIR" && bash ./ubuntu)
 else
     echo "OS not recognized: $OS. Exiting."
     exit 1

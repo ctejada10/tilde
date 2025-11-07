@@ -1,5 +1,24 @@
-# Installing useful binaries
-sudo apt-get install htop tree stow gpg python3 eza zsh 
+#!/usr/bin/env bash
+# Installing useful binaries required by aliases and tooling
+# - Editors/tools: vim, eza, bat
+# - Shell/env: zsh, git, curl
+# - Utilities: htop, tree, stow, gpg, python3, ipython3
+
+set -euo pipefail
+
+sudo apt-get install -y \
+	vim \
+	eza \
+	bat \
+	zsh \
+	git \
+	curl \
+	htop \
+	tree \
+	stow \
+	gpg \
+	python3 \
+	ipython3
 
 # Installing Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -7,5 +26,5 @@ sh get-docker.sh
 rm get-docker.sh
 
 # Adding user to the `docker` group
-sudo usermod -aG docker ctejada
+sudo usermod -aG docker "${SUDO_USER:-${USER}}"
 
