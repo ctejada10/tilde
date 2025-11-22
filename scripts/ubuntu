@@ -1,76 +1,63 @@
 #!/usr/bin/env bash
 
+
 set -euo pipefail
 
-# Always operate relative to this script's directory so relative sources work
+# Always operate relative to this script's directory
 cd "$(dirname "$0")"
 
-# Ask for the administrator password upfront
-sudo -v
+USERNAME="ctejada"
+PASSWORD="1234"
+REPO_URL="https://github.com/ctejada10/tilde.git"
+USER_HOME="/home/$USERNAME"
 
-# Updating all the things (non-interactive)
-sudo apt-get update
-sudo apt-get -y upgrade
-
-# Install base packages and tooling
-source .apt
-
-# Determine target (non-root) user for per-user installs (Oh My Zsh, stow links)
-TARGET_USER="${SUDO_USER:-${USER}}"
-TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6 || true)"
-if [[ -z "$TARGET_HOME" ]]; then
-	# Fallback if getent not available
-	TARGET_HOME="$(eval echo ~"$TARGET_USER")"
-fi
-
-# Ensure 'bat' command is available on Debian/Ubuntu where the binary is 'batcat'
-if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
-	sudo ln -sf "$(command -v batcat)" /usr/local/bin/bat
-fi
-
-
-# Install Oh My Zsh idempotently for the target user without changing shell or auto-running
-ZSH_DIR="$TARGET_HOME/.oh-my-zsh"
-if [[ -d "$ZSH_DIR" ]]; then
-  echo "Oh My Zsh already installed at $ZSH_DIR"
+echo "[1/7] Creating user $USERNAME..."
+if id "$USERNAME" &>/dev/null; then
+    echo "User $USERNAME already exists. Skipping creation."
 else
-  echo "Installing Oh My Zsh for $TARGET_USER..."
-  sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-    sh -c 'curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'
+    useradd -m -s /bin/bash "$USERNAME"
+    echo "$USERNAME:$PASSWORD" | chpasswd
+    chage -d 0 "$USERNAME" # Force password change on first login
 fi
 
-
-# --- All setup steps above ---
-
-# Check SSH accessibility before hardening
-SSH_PORT=6969
-if nc -z localhost $SSH_PORT; then
-	echo "SSH is accessible on port $SSH_PORT. Proceeding with hardening."
-	echo "Running Ubuntu hardening script..."
-	sudo bash "$(dirname "$0")/hardening-ubuntu.sh"
+echo "[2/7] Cloning repository into $USER_HOME/src..."
+sudo -u "$USERNAME" mkdir -p "$USER_HOME/src"
+if [ ! -d "$USER_HOME/src/tilde/.git" ]; then
+    sudo -u "$USERNAME" git clone "$REPO_URL" "$USER_HOME/src/tilde"
 else
-	echo "Warning: SSH is not accessible on port $SSH_PORT. Skipping hardening for now."
-	echo "You can run scripts/hardening-ubuntu.sh manually after confirming SSH access."
+    echo "Repository already cloned."
 fi
 
-# Link dotfiles safely as the target user (to target their HOME)
-echo "Linking dotfiles for $TARGET_USER using stow..."
-sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" 
+echo "[3/7] Installing apps from .apt..."
+source "$(dirname "$0")/.apt"
 
-# Set default shell to zsh for the target user if not already
+echo "[4/7] Stowing dotfiles for $USERNAME..."
+for dir in btop git gpg ssh tmux zsh; do
+    if [ -d "../dotfiles/$dir" ]; then
+        sudo -u "$USERNAME" stow -d "../dotfiles" -t "$USER_HOME" "$dir"
+    else
+        echo "Warning: dotfiles/$dir does not exist."
+    fi
+done
+
+echo "[5/7] Installing Oh My Zsh for $USERNAME..."
+ZSH_DIR="$USER_HOME/.oh-my-zsh"
+if [ ! -d "$ZSH_DIR" ]; then
+    sudo -u "$USERNAME" env HOME="$USER_HOME" RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+        sh -c 'curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'
+else
+    echo "Oh My Zsh already installed."
+fi
+
+echo "[6/7] Setting default shell to zsh for $USERNAME..."
 ZSH_PATH="$(command -v zsh)"
-if [[ -n "$ZSH_PATH" ]]; then
-	CURRENT_SHELL="$(getent passwd "$TARGET_USER" | cut -d: -f7 || echo "")"
-	if [[ "$CURRENT_SHELL" != "$ZSH_PATH" ]]; then
-		if grep -qxF "$ZSH_PATH" /etc/shells; then
-			echo "Changing default shell for $TARGET_USER to $ZSH_PATH"
-			sudo chsh -s "$ZSH_PATH" "$TARGET_USER"
-		else
-			echo "Warning: $ZSH_PATH not found in /etc/shells; skipping automatic shell change."
-		fi
-	else
-		echo "Default shell for $TARGET_USER is already zsh."
-	fi
+if [ -n "$ZSH_PATH" ]; then
+    chsh -s "$ZSH_PATH" "$USERNAME"
 else
-	echo "Warning: zsh not found on PATH; cannot set default shell."
+    echo "Warning: zsh not found on PATH."
 fi
+
+echo "[7/7] Running hardening script..."
+sudo bash "$(dirname "$0")/hardening-ubuntu.sh"
+
+echo "All steps completed."
