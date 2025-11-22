@@ -16,15 +16,8 @@ apt-get update && apt-get -y upgrade
 apt-get install -y ufw fail2ban apt-listchanges unattended-upgrades
 
 
-# 3. Enable and configure UFW (firewall)
-ufw default deny incoming
-ufw default allow outgoing
-# Allow SSH on port 6969
-ufw allow 6969/tcp
-# Allow HTTP and HTTPS for web applications
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw --force enable
+
+# --- UFW (firewall) configuration moved to end of script ---
 
 # 4. Enable automatic security updates
 cat <<EOF > /etc/apt/apt.conf.d/20auto-upgrades
@@ -47,9 +40,25 @@ systemctl enable --now fail2ban
 apt-get -y autoremove
 apt-get -y autoclean
 
+
 # 8. Disable guest login (for desktop systems)
 if [ -f /etc/lightdm/lightdm.conf ]; then
   sed -i '/^\[Seat:\*\]/a allow-guest=false' /etc/lightdm/lightdm.conf
+fi
+
+# 9. Enable and configure UFW (firewall) at the end, after SSH port change
+echo "Checking SSH accessibility on port 6969 before enabling firewall..."
+if nc -z localhost 6969; then
+  echo "SSH is accessible on port 6969. Enabling firewall."
+  ufw default deny incoming
+  ufw default allow outgoing
+  ufw allow 6969/tcp
+  ufw allow 80/tcp
+  ufw allow 443/tcp
+  ufw --force enable
+else
+  echo "WARNING: SSH is NOT accessible on port 6969. Skipping firewall enable to prevent lockout."
+  echo "Please verify SSH access and run 'sudo ufw --force enable' manually when ready."
 fi
 
 echo "Basic Ubuntu LTS hardening complete."

@@ -39,9 +39,19 @@ else
     sh -c 'curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'
 fi
 
-# Run hardening script
-echo "Running Ubuntu hardening script..."
-sudo bash "$(dirname "$0")/hardening-ubuntu.sh"
+
+# --- All setup steps above ---
+
+# Check SSH accessibility before hardening
+SSH_PORT=6969
+if nc -z localhost $SSH_PORT; then
+	echo "SSH is accessible on port $SSH_PORT. Proceeding with hardening."
+	echo "Running Ubuntu hardening script..."
+	sudo bash "$(dirname "$0")/hardening-ubuntu.sh"
+else
+	echo "Warning: SSH is not accessible on port $SSH_PORT. Skipping hardening for now."
+	echo "You can run scripts/hardening-ubuntu.sh manually after confirming SSH access."
+fi
 
 # Link dotfiles safely as the target user (to target their HOME)
 echo "Linking dotfiles for $TARGET_USER using stow..."
