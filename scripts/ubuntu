@@ -28,15 +28,20 @@ if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
 	sudo ln -sf "$(command -v batcat)" /usr/local/bin/bat
 fi
 
+
 # Install Oh My Zsh idempotently for the target user without changing shell or auto-running
 ZSH_DIR="$TARGET_HOME/.oh-my-zsh"
 if [[ -d "$ZSH_DIR" ]]; then
-	echo "Oh My Zsh already installed at $ZSH_DIR"
+  echo "Oh My Zsh already installed at $ZSH_DIR"
 else
-	echo "Installing Oh My Zsh for $TARGET_USER..."
-	sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-		sh -c 'curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'
+  echo "Installing Oh My Zsh for $TARGET_USER..."
+  sudo -u "$TARGET_USER" env HOME="$TARGET_HOME" RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+    sh -c 'curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'
 fi
+
+# Run hardening script
+echo "Running Ubuntu hardening script..."
+sudo bash "$(dirname "$0")/hardening-ubuntu.sh"
 
 # Link dotfiles safely as the target user (to target their HOME)
 echo "Linking dotfiles for $TARGET_USER using stow..."
