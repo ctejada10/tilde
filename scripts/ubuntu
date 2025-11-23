@@ -48,10 +48,11 @@ done
 chown -R "$USER_NAME:$USER_NAME" "$USER_HOME"
 
 # 5. Install oh-my-zsh for ctejada
+
 OH_MY_ZSH_DIR="$USER_HOME/.oh-my-zsh"
 if [ ! -d "$OH_MY_ZSH_DIR" ]; then
     echo "[*] Installing oh-my-zsh for $USER_NAME..."
-    sudo -u "$USER_NAME" sh -c "RUNZSH=no CHSH=no KEEP_ZSHRC=yes bash -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
+    sudo -u "$USER_NAME" env RUNZSH=no CHSH=no KEEP_ZSHRC=yes bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
 # 6. Set default shell to zsh for ctejada
