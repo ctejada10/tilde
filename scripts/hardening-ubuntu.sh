@@ -6,7 +6,7 @@ set -euo pipefail
 ###############################################################################
 
 NEW_SSH_PORT=6969
-USER_NAME="ctejada"
+USERNAME="ctejada"
 
 ###############################################################################
 # HELPER
@@ -18,8 +18,8 @@ log() { echo "[*] $*"; }
 # PRECHECKS
 ###############################################################################
 
-if ! id "$USER_NAME" >/dev/null 2>&1; then
-    echo "User $USER_NAME does not exist. Exiting."
+if ! id "$USERNAME" >/dev/null 2>&1; then
+    echo "User $USERNAME does not exist. Exiting."
     exit 1
 fi
 
@@ -142,8 +142,8 @@ cat <<'EOS' > /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
-USER_NAME="ctejada"
-KEYFILE="/home/${USER_NAME}/.ssh/authorized_keys"
+USERNAME="ctejada"
+KEYFILE="/home/${USERNAME}/.ssh/authorized_keys"
 
 # Only upgrade to secure mode if key exists and file is nonempty
 if [ ! -f "$KEYFILE" ]; then
