@@ -31,7 +31,13 @@ else
     echo "[*] Repository already exists at $REPO_DIR. Skipping copy."
 fi
 
-# 3. Stow dotfiles (btop, git, gpg, ssh, tmux, zsh)
+
+# 3. Install apps from .apt (must be before stow)
+cd "$REPO_DIR/scripts"
+chmod +x .apt
+./.apt
+
+# 4. Stow dotfiles (btop, git, gpg, ssh, tmux, zsh)
 cd "$REPO_DIR/dotfiles"
 for d in btop git gpg ssh tmux zsh; do
     if [ -d "$d" ]; then
@@ -40,11 +46,6 @@ for d in btop git gpg ssh tmux zsh; do
     fi
 done
 chown -R "$USER_NAME:$USER_NAME" "$USER_HOME"
-
-# 4. Install apps from .apt
-cd "$REPO_DIR/scripts"
-chmod +x .apt
-./.apt
 
 # 5. Install oh-my-zsh for ctejada
 OH_MY_ZSH_DIR="$USER_HOME/.oh-my-zsh"
