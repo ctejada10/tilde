@@ -2,11 +2,11 @@
 set -euo pipefail
 
 ###############################################################################
-# CONFIGURATION — EDIT THESE FIRST
+# CONFIGURATION — USER PRESET TO "ctejada"
 ###############################################################################
 
-NEW_SSH_PORT=6969        # New SSH port
-USER_NAME="ctejada" # The user you log in as (non-root)
+NEW_SSH_PORT=6969
+USER_NAME="ctejada"
 
 ###############################################################################
 # HELPER
@@ -166,8 +166,6 @@ CONF
 systemctl restart ssh.service ssh.socket
 EOS
 
-# Insert username into script
-sed -i "s/YOURUSERNAME/${USER_NAME}/g" /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 chmod +x /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 
 # systemd service
@@ -203,7 +201,7 @@ systemctl enable --now securemode.timer
 cat <<EOF
 
 =======================================================================
-INITIAL HARDENING COMPLETE
+INITIAL HARDENING COMPLETE — USER = ctejada
 =======================================================================
 
 SSH is now on port ${NEW_SSH_PORT}.
@@ -212,7 +210,7 @@ Password login is ENABLED temporarily.
 ⚠ NEXT STEPS (IMPORTANT):
 
 1. SSH into the server using:
-   ssh -p ${NEW_SSH_PORT} ${USER_NAME}@SERVER_IP
+   ssh -p ${NEW_SSH_PORT} ctejada@SERVER_IP
 
 2. Install your SSH key:
    mkdir -p ~/.ssh
@@ -227,7 +225,7 @@ Password login is ENABLED temporarily.
 
 After that, only key-based SSH will work.
 
-Keep your current session open while testing new SSH login.
+KEEP YOUR CURRENT SESSION OPEN UNTIL YOU CONFIRM NEW SSH ACCESS.
 
 =======================================================================
 EOF
