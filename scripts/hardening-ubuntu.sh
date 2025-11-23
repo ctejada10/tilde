@@ -142,7 +142,7 @@ cat <<'EOS' > /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
-USER_NAME="YOURUSERNAME"
+USER_NAME="ctejada"
 KEYFILE="/home/${USER_NAME}/.ssh/authorized_keys"
 
 # Only upgrade to secure mode if key exists and file is nonempty
