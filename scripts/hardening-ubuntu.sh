@@ -167,7 +167,7 @@ systemctl restart ssh.service ssh.socket
 EOS
 
 # Insert username into script
-sed -i "s/ctejada/${USER_NAME}/g" /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
+sed -i "s/YOURUSERNAME/${USER_NAME}/g" /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 chmod +x /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 
 # systemd service
