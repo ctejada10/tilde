@@ -1,63 +1,63 @@
 #!/usr/bin/env bash
-
+# Ubuntu setup script for root execution
+# Usage: ./ubuntu <repo_tmp_dir>
 
 set -euo pipefail
 
-# Always operate relative to this script's directory
-cd "$(dirname "$0")"
+REPO_TMP_DIR="${1:-/tmp/tilde-setup}"
+USER_NAME="ctejada"
+USER_PASS="1234"
+USER_HOME="/home/${USER_NAME}"
+SRC_DIR="${USER_HOME}/src"
+REPO_DIR="${SRC_DIR}/tilde"
 
-USERNAME="ctejada"
-PASSWORD="1234"
-REPO_URL="https://github.com/ctejada10/tilde.git"
-USER_HOME="/home/$USERNAME"
-
-echo "[1/7] Creating user $USERNAME..."
-if id "$USERNAME" &>/dev/null; then
-    echo "User $USERNAME already exists. Skipping creation."
+# 1. Create user ctejada with password and force password change on first login
+if ! id "$USER_NAME" &>/dev/null; then
+    echo "[*] Creating user $USER_NAME..."
+    useradd -m -s /bin/bash "$USER_NAME"
+    echo "$USER_NAME:$USER_PASS" | chpasswd
+    chage -d 0 "$USER_NAME"
 else
-    useradd -m -s /bin/bash "$USERNAME"
-    echo "$USERNAME:$PASSWORD" | chpasswd
-    chage -d 0 "$USERNAME" # Force password change on first login
+    echo "[*] User $USER_NAME already exists. Skipping creation."
 fi
 
-echo "[2/7] Cloning repository into $USER_HOME/src..."
-sudo -u "$USERNAME" mkdir -p "$USER_HOME/src"
-if [ ! -d "$USER_HOME/src/tilde/.git" ]; then
-    sudo -u "$USERNAME" git clone "$REPO_URL" "$USER_HOME/src/tilde"
+# 2. Create /home/ctejada/src and clone repo
+mkdir -p "$SRC_DIR"
+if [ ! -d "$REPO_DIR" ]; then
+    echo "[*] Copying repository to $REPO_DIR..."
+    cp -a "$REPO_TMP_DIR" "$REPO_DIR"
+    chown -R "$USER_NAME:$USER_NAME" "$REPO_DIR"
 else
-    echo "Repository already cloned."
+    echo "[*] Repository already exists at $REPO_DIR. Skipping copy."
 fi
 
-echo "[3/7] Installing apps from .apt..."
-source "$(dirname "$0")/.apt"
-
-echo "[4/7] Stowing dotfiles for $USERNAME..."
-for dir in btop git gpg ssh tmux zsh; do
-    if [ -d "../dotfiles/$dir" ]; then
-        sudo -u "$USERNAME" stow -d "../dotfiles" -t "$USER_HOME" "$dir"
-    else
-        echo "Warning: dotfiles/$dir does not exist."
+# 3. Stow dotfiles (btop, git, gpg, ssh, tmux, zsh)
+cd "$REPO_DIR/dotfiles"
+for d in btop git gpg ssh tmux zsh; do
+    if [ -d "$d" ]; then
+        echo "[*] Stowing $d..."
+        stow -t "$USER_HOME" "$d"
     fi
 done
+chown -R "$USER_NAME:$USER_NAME" "$USER_HOME"
 
-echo "[5/7] Installing Oh My Zsh for $USERNAME..."
-ZSH_DIR="$USER_HOME/.oh-my-zsh"
-if [ ! -d "$ZSH_DIR" ]; then
-    sudo -u "$USERNAME" env HOME="$USER_HOME" RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-        sh -c 'curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'
-else
-    echo "Oh My Zsh already installed."
+# 4. Install apps from .apt
+cd "$REPO_DIR/scripts"
+chmod +x .apt
+./.apt
+
+# 5. Install oh-my-zsh for ctejada
+OH_MY_ZSH_DIR="$USER_HOME/.oh-my-zsh"
+if [ ! -d "$OH_MY_ZSH_DIR" ]; then
+    echo "[*] Installing oh-my-zsh for $USER_NAME..."
+    sudo -u "$USER_NAME" sh -c "RUNZSH=no CHSH=no KEEP_ZSHRC=yes bash -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
 fi
 
-echo "[6/7] Setting default shell to zsh for $USERNAME..."
-ZSH_PATH="$(command -v zsh)"
-if [ -n "$ZSH_PATH" ]; then
-    chsh -s "$ZSH_PATH" "$USERNAME"
-else
-    echo "Warning: zsh not found on PATH."
-fi
+# 6. Set default shell to zsh for ctejada
+chsh -s "$(which zsh)" "$USER_NAME"
 
-echo "[7/7] Running hardening script..."
-sudo bash "$(dirname "$0")/hardening-ubuntu.sh"
+# 7. Run hardening-ubuntu.sh
+chmod +x "$REPO_DIR/scripts/hardening-ubuntu.sh"
+"$REPO_DIR/scripts/hardening-ubuntu.sh"
 
-echo "All steps completed."
+echo "[*] Setup complete. User $USER_NAME created, dotfiles stowed, apps installed, oh-my-zsh set up, and system hardened."
