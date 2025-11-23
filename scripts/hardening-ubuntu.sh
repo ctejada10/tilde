@@ -29,9 +29,17 @@ apt update && apt upgrade -y
 apt install -y ufw fail2ban auditd netcat-openbsd
 
 ###############################################################################
+# DISABLE SSH SOCKET ACTIVATION (CRUCIAL)
+###############################################################################
+log "Disabling ssh.socket to allow custom SSH port..."
+
+systemctl disable --now ssh.socket
+systemctl mask ssh.socket
+
+###############################################################################
 # SSH CONFIGURATION — SAFE MODE FIRST (password allowed)
 ###############################################################################
-log "Configuring SSH in safe mode..."
+log "Configuring SSH in safe mode on port ${NEW_SSH_PORT}..."
 
 # Backup
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
@@ -39,7 +47,6 @@ cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
 mkdir -p /etc/ssh/sshd_config.d/
 
 cat <<EOF > /etc/ssh/sshd_config.d/10-safe-initial.conf
-# SAFE MODE SSH CONFIG FOR FRESH INSTALL
 Port ${NEW_SSH_PORT}
 PasswordAuthentication yes
 PubkeyAuthentication yes
@@ -51,7 +58,7 @@ X11Forwarding no
 UsePAM yes
 EOF
 
-# Restart sshd only (no socket activation)
+# Restart sshd only
 systemctl restart ssh
 
 ###############################################################################
@@ -202,4 +209,3 @@ KEEP YOUR CURRENT SESSION OPEN UNTIL YOU CONFIRM NEW SSH ACCESS.
 
 =======================================================================
 EOF
-
