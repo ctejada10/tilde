@@ -4,22 +4,19 @@ set -euo pipefail
 ###############################################################################
 # CONFIGURATION — USER PRESET TO "ctejada"
 ###############################################################################
-
 NEW_SSH_PORT=6969
-USERNAME="ctejada"
+USER_NAME="ctejada"
 
 ###############################################################################
 # HELPER
 ###############################################################################
-
 log() { echo "[*] $*"; }
 
 ###############################################################################
 # PRECHECKS
 ###############################################################################
-
-if ! id "$USERNAME" >/dev/null 2>&1; then
-    echo "User $USERNAME does not exist. Exiting."
+if ! id "$USER_NAME" >/dev/null 2>&1; then
+    echo "User $USER_NAME does not exist. Exiting."
     exit 1
 fi
 
@@ -28,30 +25,24 @@ log "Starting secure hardening for fresh Ubuntu 24.04 installation."
 ###############################################################################
 # SYSTEM UPDATE & TOOLS
 ###############################################################################
-
 apt update && apt upgrade -y
-apt install -y ufw fail2ban auditd nc
+apt install -y ufw fail2ban auditd netcat-openbsd
 
 ###############################################################################
 # SSH CONFIGURATION — SAFE MODE FIRST (password allowed)
 ###############################################################################
-
 log "Configuring SSH in safe mode..."
 
+# Backup
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
 
 mkdir -p /etc/ssh/sshd_config.d/
 
 cat <<EOF > /etc/ssh/sshd_config.d/10-safe-initial.conf
 # SAFE MODE SSH CONFIG FOR FRESH INSTALL
-
 Port ${NEW_SSH_PORT}
-
-# Allow both password & key auth *initially*
 PasswordAuthentication yes
 PubkeyAuthentication yes
-
-# Hardening settings
 PermitRootLogin no
 Protocol 2
 MaxAuthTries 5
@@ -60,40 +51,30 @@ X11Forwarding no
 UsePAM yes
 EOF
 
-# Update systemd SSH socket (Ubuntu 24.04)
-mkdir -p /etc/systemd/system/ssh.socket.d
-cat <<EOF > /etc/systemd/system/ssh.socket.d/override.conf
-[Socket]
-ListenStream=${NEW_SSH_PORT}
-EOF
-
-systemctl daemon-reload
-systemctl restart ssh.socket ssh.service
+# Restart sshd only (no socket activation)
+systemctl restart ssh
 
 ###############################################################################
 # FIREWALL — SSH OPEN GLOBALLY, PROTECTED BY FAIL2BAN
 ###############################################################################
-
 log "Configuring UFW firewall..."
 
 ufw --force reset
 ufw default deny incoming
 ufw default allow outgoing
 
-# Allow web server ports
+# Web server ports
 ufw allow 80/tcp
 ufw allow 443/tcp
 
-# Allow SSH globally
+# SSH globally
 ufw allow ${NEW_SSH_PORT}/tcp comment "SSH access"
 
-# Enable firewall
 ufw --force enable
 
 ###############################################################################
 # FAIL2BAN CONFIGURATION
 ###############################################################################
-
 log "Configuring Fail2Ban..."
 
 cat <<EOF > /etc/fail2ban/jail.d/ssh.local
@@ -113,7 +94,6 @@ systemctl restart fail2ban
 ###############################################################################
 # KERNEL / SYSCTL HARDENING
 ###############################################################################
-
 log "Applying kernel/network sysctl hardening..."
 
 cp /etc/sysctl.conf /etc/sysctl.conf.backup
@@ -135,35 +115,29 @@ sysctl --system
 ###############################################################################
 # AUTO-SECURE MODE — DISABLE PASSWORDS AFTER KEY IS INSTALLED
 ###############################################################################
-
 log "Installing secure-mode auto-upgrade mechanism..."
 
 cat <<'EOS' > /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
-USERNAME="ctejada"
-KEYFILE="/home/${USERNAME}/.ssh/authorized_keys"
+USER_NAME="ctejada"
+KEYFILE="/home/${USER_NAME}/.ssh/authorized_keys"
 
 # Only upgrade to secure mode if key exists and file is nonempty
-if [ ! -f "$KEYFILE" ]; then
-    exit 0
-fi
-
-if [ ! -s "$KEYFILE" ]; then
+if [ ! -f "$KEYFILE" ] || [ ! -s "$KEYFILE" ]; then
     exit 0
 fi
 
 echo "[*] SSH key detected — enabling secure mode (password login OFF)."
 
 cat <<CONF > /etc/ssh/sshd_config.d/20-secure-mode.conf
-# SECURE MODE: Password login disabled
 PasswordAuthentication no
 PubkeyAuthentication yes
 PermitRootLogin no
 CONF
 
-systemctl restart ssh.service ssh.socket
+systemctl restart ssh
 EOS
 
 chmod +x /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
@@ -197,7 +171,6 @@ systemctl enable --now securemode.timer
 ###############################################################################
 # DONE
 ###############################################################################
-
 cat <<EOF
 
 =======================================================================
@@ -229,3 +202,4 @@ KEEP YOUR CURRENT SESSION OPEN UNTIL YOU CONFIRM NEW SSH ACCESS.
 
 =======================================================================
 EOF
+
