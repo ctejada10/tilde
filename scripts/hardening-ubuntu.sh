@@ -142,7 +142,7 @@ cat <<'EOS' > /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
-USER_NAME="ctejada"
+USER_NAME="YOURUSERNAME"
 KEYFILE="/home/${USER_NAME}/.ssh/authorized_keys"
 
 # Only upgrade to secure mode if key exists and file is nonempty
@@ -166,7 +166,8 @@ CONF
 systemctl restart ssh.service ssh.socket
 EOS
 
-
+# Insert username into script
+sed -i "s/YOURUSERNAME/${USER_NAME}/g" /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 chmod +x /usr/local/sbin/upgrade_ssh_to_secure_mode.sh
 
 # systemd service
