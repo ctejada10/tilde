@@ -18,6 +18,8 @@ font-style = Light
 # ────── Window Layout ──────
 window-padding-x = 15,18
 window-padding-y = 8,7
+window-width = 66
+window-height = 57
 macos-titlebar-proxy-icon = hidden
 title = " "
 window-colorspace = "display-p3"
