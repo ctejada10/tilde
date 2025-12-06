@@ -19,7 +19,8 @@ sudo apt-get install -y \
 	stow \
 	gpg \
 	python3 \
-	ipython3
+	ipython3 \
+	virtualevnwrapper
 
 # Installing Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
