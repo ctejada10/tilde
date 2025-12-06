@@ -100,3 +100,5 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+# Update omz automatically
+zstyle ':omz:update' mode auto
