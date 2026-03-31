@@ -2,7 +2,7 @@ alias vi=vim
 alias svi='sudo vim'
 alias tree='tree -lsh --du'
 
-alias ipython='clear; ipython2 --classic --no-banner'
+# alias ipython='clear; ipython2 --classic --no-banner'
 alias whereami='uname -n'
 
 alias docker-stop-all='docker stop $(docker ps -aq)'
