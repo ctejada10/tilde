@@ -56,11 +56,21 @@ plugins=(git)
 # Python Virtual Environments
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
-  source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+  # Location varies by distro/install method
+  if [[ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]]; then
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+  elif [[ -f /usr/local/bin/virtualenvwrapper.sh ]]; then
+    source /usr/local/bin/virtualenvwrapper.sh
+  elif command -v virtualenvwrapper.sh &>/dev/null; then
+    source "$(command -v virtualenvwrapper.sh)"
+  fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-  # Python virtual environments
   VIRTUALENVWRAPPER_PYTHON=/opt/homebrew/bin/python3
-  source /opt/homebrew/bin/virtualenvwrapper.sh
+  if [[ -f /opt/homebrew/bin/virtualenvwrapper.sh ]]; then
+    source /opt/homebrew/bin/virtualenvwrapper.sh
+  elif command -v virtualenvwrapper.sh &>/dev/null; then
+    source "$(command -v virtualenvwrapper.sh)"
+  fi
 fi
 
 # Launching SSH agent

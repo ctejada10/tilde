@@ -1,3 +1,13 @@
+function dps() {
+  docker ps --format '{{.Names}}\t{{.Status}}\t{{.Ports}}' \
+    | awk -F'\t' -v OFS='\t' '
+        BEGIN { print "NAMES\tSTATUS\tPORTS" }
+        { gsub(/ [0-9]+.*/, "", $2); gsub(/[0-9.]+:/, "", $3); gsub(/\/[a-z]+/, "", $3); print }
+      ' \
+    | column -t \
+    | cut -c-59
+}
+
 function extract {
   echo Extracting $1 ...
   if [ -f $1 ] ; then

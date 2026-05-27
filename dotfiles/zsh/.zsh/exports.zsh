@@ -25,6 +25,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
   export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
   export PATH="/opt/homebrew/bin:$PATH"
+	export PATH="$HOME/.local/bin:$PATH"
 
   # GPG
   export GPG_TTY=`tty`
