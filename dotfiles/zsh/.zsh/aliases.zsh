@@ -5,7 +5,6 @@ alias tree='tree -lsh --du'
 # alias ipython='clear; ipython2 --classic --no-banner'
 alias whereami='uname -n'
 
-alias dps='docker ps --format "table {{.Names}}\t{{.Status}}" | sed -E "s/ [0-9].{0,}//" | cut -c-59'
 alias docker-stop-all='docker stop $(docker ps -aq)'
 alias docker-rmi-all='docker rmi $(docker images -q)'
 alias docker-rm-all='docker rm $(docker ps -aq)'
