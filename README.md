@@ -4,6 +4,24 @@ Your dotfiles is how you personalize your system. These are mine.
 
 I use this repository to set up all my computers, Ubuntu and macOS, from a fresh install. Everything needed to install my preferred setup of macOS is detailed in this readme. As Holman said, [dotfiles are meant to be forked.](https://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/)
 
+## Bootstrap
+
+**Phase 1** — open Terminal on the fresh machine and run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/ctejada10/tilde/master/setup.sh | bash
+```
+
+This installs Xcode CLT, Homebrew, all Brewfile packages (including Dropbox), and applies macOS settings.
+
+**Phase 2** — after signing into Dropbox and waiting for sync:
+
+```sh
+bash ~/Library/CloudStorage/Dropbox/repositories/tilde/scripts/finish.sh
+```
+
+This creates the `~/Repositories` symlink (pointing to the Dropbox repositories folder) and links all dotfiles via stow.
+
 ## Fresh macOS install
 This repository assumes we're working with a fresh OS install, but before we go formatting drives, we should make sure we didn't forget anything, like:
 

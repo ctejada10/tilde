@@ -2,6 +2,9 @@
 
 # ~/.macos — https://mths.be/macos
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(dirname "$SCRIPT_DIR")"
+
 # Ask for the administrator password upfront
 sudo -v
 
@@ -17,13 +20,11 @@ echo "------------------------------"
 #sudo softwareupdate -ir --verbose
 
 echo "------------------------------"
-echo "Installing Xcode Command Line Tools."
-# Install Xcode command line tools
-xcode-select --install
 
-source ~/Repositories/tilde/scripts/.brew
-# Install ohmyzsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+source "$SCRIPT_DIR/.brew"
+# Install oh-my-zsh without modifying .zshrc (stow manages that)
+RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 ###############################################################################
 # OS Settings                                                                 #
@@ -162,7 +163,7 @@ defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # Save screenshots to pictures/screenshots
-defaults write com.apple.screencapture location -string '/Users/ctejada/Library/Mobile Documents/com~apple~CloudDocs/Temporary Files/media/screenshots'
+defaults write com.apple.screencapture location -string "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Temporary Files/media/screenshots"
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
 defaults write com.apple.screencapture type -string "png"
@@ -411,15 +412,6 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
 
 ###############################################################################
-# Linking dotfiles
-###############################################################################
-
-source .stow
-
-# Installing OMZ
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-###############################################################################
 # Hide unused directories from ~                                              #
 ###############################################################################
 
@@ -461,7 +453,6 @@ for app in "Activity Monitor" \
 	killall "${app}" &> /dev/null
 done
 
-ln -sf ~/Repositories/tilde/dotfiles/ghostty/config /Users/ctejada/Library/Application\ Support/com.mitchellh.ghostty/config
 mkdir -p ~/Downloads/Documents ~/Downloads/Media/Images ~/Downloads/Media/Videos
 
 echo "Done. Note that some of these changes require a logout/restart to take effect."
