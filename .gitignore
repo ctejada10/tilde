@@ -1,4 +1,4 @@
-otfiles/vim/.vim/bundle/
+dotfiles/vim/.vim/bundle/
 dotfiles/keychain/
 dotfiles/ssh/.ssh/arnor*
 dotfiles/ssh/.ssh/known_hosts
@@ -6,17 +6,12 @@ dotfiles/ssh/.ssh/authorized_keys
 dotfiles/vim/.vim
 dotfiles/zsh/.zsh_history
 dotfiles/zsh/.zsh/cache
-dotfiles/gpg/.gnupg/*.d
-dotfiles/gpg/.gnupg/pub*.*
-dotfiles/gpg/.gnupg/rand*
-dotfiles/gpg/.gnupg/trust*
-dotfiles/gpg/.gnupg/.#*
-dotfiles/ssh/.ssh/environment*
 dotfiles/hyper/.hyper_plugins/*
 assets/.virtualenvs/*
 assets/assets*
 assets/com.googlecode.iterm2.plist
 assets/.zsh-history
+scripts/stow-backups/
 .DS_Store
 dotfiles/ipython/.ipython/profile_default/db/dhist
 /dotfiles/ipython/.ipython/profile_default/history.sqlite
