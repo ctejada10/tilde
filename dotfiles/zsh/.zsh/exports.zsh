@@ -27,8 +27,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/opt/homebrew/bin:$PATH"
 	export PATH="$HOME/.local/bin:$PATH"
 
-  # GPG
-  export GPG_TTY=`tty`
   # Brew autoupdate
   export HOMEBREW_NO_AUTO_UPDATE=1
   # Python virtual environments

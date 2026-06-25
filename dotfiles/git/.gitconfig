@@ -1,7 +1,7 @@
 [user]
 	name = Carlos E. Tejada
 	email = carlos@carlosetejada.com
-	signingkey = 175864B0EFB2DF1AF66C24BE1EBE45FDE3DDD7C2
+	signingkey = ~/.ssh/arnor_signing.pub
 
 [alias]
 	graphgpg = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)[gpg:%GK%x20%G?]%C(reset)%n%x20%s%n"
@@ -27,7 +27,10 @@
 	prompt = false
 
 [gpg]
-	program = /opt/homebrew/bin/gpg
+	format = ssh
+
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
 
 [core]
 	excludesfile = /Users/ctejada/.gitignore_global
@@ -40,4 +43,4 @@
 [pull]
 	rebase = false
 [commit]
-	gpgsign = false
+	gpgsign = true

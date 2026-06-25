@@ -74,9 +74,10 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # Launching SSH agent
-if [ -z "$SSH_AUTH_SOCK" ] ; then
-  eval `ssh-agent -s`
-  ssh-add
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  eval "$(ssh-agent -s)"
+  ssh-add --apple-use-keychain ~/.ssh/arnor
+  ssh-add --apple-use-keychain ~/.ssh/arnor_signing
 fi
 
 # FZF setup (portable)
