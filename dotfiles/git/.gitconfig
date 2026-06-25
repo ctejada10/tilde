@@ -15,16 +15,40 @@
 [tag]
 	gpgsign = true
 
+[init]
+	defaultBranch = main
+
 [core]
 	excludesfile = ~/.gitignore_global
+	autocrlf = false
+	fsmonitor = true
+	untrackedcache = true
 
-[color]
-	ui = auto
+[push]
+	default = simple
+	autoSetupRemote = true
 
 [pull]
 	rebase = false
 
+[fetch]
+	prune = true
+	pruneTags = true
+
+[branch]
+	sort = -committerdate
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+	updateRefs = true
+
+[merge]
+	conflictstyle = zdiff3
+
 [diff]
+	algorithm = histogram
+	colorMoved = default
 	tool = nvimdiff
 
 [difftool "nvimdiff"]
@@ -32,6 +56,19 @@
 
 [difftool]
 	prompt = false
+
+[rerere]
+	enabled = true
+	autoupdate = true
+
+[color]
+	ui = auto
+
+[column]
+	ui = auto
+
+[help]
+	autocorrect = prompt
 
 [filter "lfs"]
 	required = true
