@@ -20,5 +20,8 @@ alias ls="eza"
 alias ll="eza -lh --icons"
 alias lla="eza -alh --icons"
 alias tree="eza --tree"
-alias cat="bat"
-alias bat="batcat"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  alias cat="bat"
+else
+  alias cat="batcat"
+fi
