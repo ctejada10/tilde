@@ -152,6 +152,9 @@ eq "0" "$(grep -c 'conflict: backing up' "$SCRATCH/stow2.log")"
 ###############################################################################
 section "finish.sh end to end"
 ###############################################################################
+# A fresh clone has no decrypted ssh keys - they live encrypted in secrets/.
+# Unseal first, the same way typing the passphrase does during a real restore.
+if ensure_secrets_available; then
 FAKE2="$SCRATCH/home-finish"
 make_fake_home "$FAKE2"
 printf 'source $ZSH/oh-my-zsh.sh\n' > "$FAKE2/.zshrc"
@@ -178,6 +181,10 @@ if [ "$n" -gt 0 ]; then _pass; else _fail "no MonoLisa fonts installed"; fi
 it "is idempotent"
 in_fake_home "$FAKE2" /bin/bash "$REPO_DIR/scripts/finish.sh" > "$SCRATCH/finish2.log" 2>&1
 eq "0" "$?"
+
+else
+  skip "finish.sh end to end (no age key available to unseal the ssh keys)"
+fi
 
 ###############################################################################
 section "Idempotent defaults"

@@ -44,6 +44,10 @@ hasnt() {
   if grep -Eq "$2" "$1" 2>/dev/null; then _fail "'$2' should not match in $1"; else _pass; fi
 }
 
+skip() {
+  printf '  skip %s\n' "$1"
+}
+
 section() { printf '\n%s\n' "$1"; }
 
 summary() {
@@ -80,6 +84,23 @@ same_snapshot() {
   else
     _fail "tree changed: $(grep -cE '^[+-][^+-]' "$SCRATCH/snapdiff.$$" || true) line(s) differ; first: $(grep -E '^[+-][^+-]' "$SCRATCH/snapdiff.$$" | head -1 | cut -c1-70)"
   fi
+}
+
+# A fresh clone carries no plaintext ssh keys - they are gitignored and live
+# encrypted in secrets/. finish.sh correctly reports MISSING and fails in that
+# state, so tests that expect a clean run have to unseal first, the same way a
+# real restore does when you type the passphrase.
+#
+# Returns 0 if keys are available (already present, or successfully unsealed).
+ensure_secrets_available() {
+  local repo="${1:-$REPO_DIR}"
+  [ -f "$repo/dotfiles/ssh/.ssh/arnor" ] && return 0
+  [ -f "$repo/secrets/ssh.enc.json" ] || return 1
+  local key="${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
+  [ -f "$key" ] || return 1
+  env SOPS_AGE_KEY_FILE="$key" TILDE_SSH_DIR="$repo/dotfiles/ssh/.ssh" \
+      TILDE_SECRETS_FILE="$repo/secrets/ssh.enc.json" \
+      bash "$repo/scripts/secrets.sh" unseal >/dev/null 2>&1
 }
 
 # A throwaway HOME that looks like a fresh macOS account with Dropbox synced.

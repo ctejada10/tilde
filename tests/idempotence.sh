@@ -60,6 +60,9 @@ eq "$before" "$after"
 ###############################################################################
 section "finish.sh: three consecutive runs"
 ###############################################################################
+# A fresh clone has no decrypted ssh keys - they live encrypted in secrets/.
+# Unseal first, the same way typing the passphrase does during a real restore.
+if ensure_secrets_available; then
 FAKE2="$SCRATCH/home-finish"
 make_fake_home "$FAKE2"
 printf 'source $ZSH/oh-my-zsh.sh\n' > "$FAKE2/.zshrc"
@@ -108,6 +111,10 @@ s1="$(stat -f '%m' "$REPO_DIR/secrets/ssh.enc.json" 2>/dev/null || echo none)"
 in_fake_home "$FAKE2" /bin/bash "$REPO_DIR/scripts/finish.sh" >/dev/null 2>&1
 s2="$(stat -f '%m' "$REPO_DIR/secrets/ssh.enc.json" 2>/dev/null || echo none)"
 eq "$s1" "$s2"
+
+else
+  skip "finish.sh idempotence (no age key available to unseal the ssh keys)"
+fi
 
 ###############################################################################
 section "secrets: repeated seal / unseal / lock / unlock"
