@@ -43,17 +43,25 @@ age_recipient() {
 # service-account token, and a token on a freshly wiped machine would itself
 # have to come from somewhere. What this does instead is make every sign-in
 # after the first one hands-free, via the desktop app integration.
+# `op whoami` only succeeds when there is a CLI *session* token. Under desktop
+# app integration there is none — each command is authorised individually — so
+# whoami reports "account is not signed in" while everything else works fine.
+# Probe with a real read instead.
+op_ready() {
+  op account get >/dev/null 2>&1 || op whoami >/dev/null 2>&1
+}
+
 op_signin() {
   need op
 
   # Fully non-interactive, for CI or a scripted rebuild.
   if [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
-    op whoami >/dev/null 2>&1 && return 0
+    op_ready && return 0
     die "OP_SERVICE_ACCOUNT_TOKEN is set but 1Password rejected it"
   fi
 
-  # Already unlocked: desktop app integration, or a live session.
-  op whoami >/dev/null 2>&1 && return 0
+  # Already usable: desktop app integration, or a live session.
+  op_ready && return 0
 
   if [ -d /Applications/1Password.app ]; then
     cat >&2 <<'EOF'
@@ -186,7 +194,7 @@ status() {
     printf 'age public key (missing)\n'
   fi
   printf 'sealed file    %s\n' "$([ -f "$SECRETS_FILE" ] && echo "${SECRETS_FILE#"$REPO_DIR"/}" || echo '(none)')"
-  printf '1Password      %s\n' "$(op whoami >/dev/null 2>&1 && echo 'signed in' || echo 'not signed in')"
+  printf '1Password      %s\n' "$(op_ready 2>/dev/null && echo 'connected' || echo 'not connected')"
   printf 'vault/item     %s / %s\n' "$OP_VAULT" "$OP_ITEM"
 }
 
