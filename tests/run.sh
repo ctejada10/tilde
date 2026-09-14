@@ -343,6 +343,18 @@ with_tty "$PASS\n" env SOPS_AGE_KEY_FILE="$SBOX/gone.txt" TILDE_LOCKED_KEY="$LOC
   bash "$SEC" bootstrap
 ok test -f "$SBOX/gone.txt"
 
+it "a failed passphrase falls through to 1Password rather than aborting"
+# Locked key present but unusable here (no tty for the prompt); 1Password
+# pinned to a nonexistent item so the run still fails - what matters is that
+# it *tried* the fallback instead of stopping at the passphrase.
+fb="$(env SOPS_AGE_KEY_FILE="$SBOX/absent.txt" TILDE_LOCKED_KEY="$LOCKED" \
+      TILDE_SSH_DIR="$SBOX/ssh" TILDE_SECRETS_FILE="$SBOX/sealed.enc.json" \
+      TILDE_OP_ITEM="no-such-item-$$" bash "$SEC" bootstrap 2>&1)"
+case "$fb" in
+  *"falling back to 1Password"*) _pass ;;
+  *) _fail "did not fall through: $(printf '%s' "$fb" | tail -1)" ;;
+esac
+
 it "no plaintext private key material is tracked in git"
 # Pattern assembled from fragments so this file does not match itself.
 _k1='BEGIN (OPENSSH|RSA|EC|DSA|PGP) PRIVATE'

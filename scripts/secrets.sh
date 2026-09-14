@@ -161,10 +161,16 @@ resolve_key() {
   fi
   if [ -f "$LOCKED_KEY" ]; then
     info "Unlocking the age key from ${LOCKED_KEY#"$REPO_DIR"/}"
-    unlock_key
-    return 0
+    # Subshell so unlock_key's `die` does not take the whole script with it:
+    # a forgotten passphrase is exactly when 1Password should take over.
+    if ( unlock_key ); then
+      return 0
+    fi
+    info ""
+    info "Could not unlock with the passphrase — falling back to 1Password."
+  else
+    info "No local or locked key; trying 1Password..."
   fi
-  info "No local or locked key; trying 1Password..."
   op_fetch
 }
 
