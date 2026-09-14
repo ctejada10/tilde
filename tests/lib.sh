@@ -57,6 +57,31 @@ summary() {
   return 1
 }
 
+# Record a directory tree precisely enough to prove nothing moved: relative
+# path, kind, symlink target, mode, and content hash for regular files.
+snapshot() {
+  local root="$1"
+  ( cd "$root" 2>/dev/null || return 0
+    find . -mindepth 1 \( -type f -o -type d -o -type l \) 2>/dev/null | LC_ALL=C sort | while IFS= read -r p; do
+      if [ -L "$p" ]; then
+        printf '%s\tlink\t%s\t%s\n' "$p" "$(readlink "$p")" "$(stat -f '%OLp' "$p" 2>/dev/null)"
+      elif [ -d "$p" ]; then
+        printf '%s\tdir\t-\t%s\n' "$p" "$(stat -f '%OLp' "$p" 2>/dev/null)"
+      else
+        printf '%s\tfile\t%s\t%s\n' "$p" "$(shasum -a 256 "$p" 2>/dev/null | cut -d" " -f1)" "$(stat -f '%OLp' "$p" 2>/dev/null)"
+      fi
+    done )
+}
+
+# Pass if two snapshot files are identical, otherwise show what moved.
+same_snapshot() {
+  if diff -u "$1" "$2" > "$SCRATCH/snapdiff.$$" 2>&1; then
+    _pass
+  else
+    _fail "tree changed: $(grep -cE '^[+-][^+-]' "$SCRATCH/snapdiff.$$" || true) line(s) differ; first: $(grep -E '^[+-][^+-]' "$SCRATCH/snapdiff.$$" | head -1 | cut -c1-70)"
+  fi
+}
+
 # A throwaway HOME that looks like a fresh macOS account with Dropbox synced.
 make_fake_home() {
   local fake="$1"
@@ -80,5 +105,9 @@ with_tty() {
 # Run a command with a clean environment, as a fresh login shell would.
 in_fake_home() {
   local fake="$1"; shift
-  env -i HOME="$fake" PATH=/usr/bin:/bin:/usr/sbin:/sbin TERM=xterm "$@"
+  # env -i wipes the environment, so anything the scripts need must be named
+  # here — including the stow backup override, or finish.sh's internal .stow
+  # call writes backups into the repo.
+  env -i HOME="$fake" PATH=/usr/bin:/bin:/usr/sbin:/sbin TERM=xterm \
+      TILDE_STOW_BACKUP_DIR="${TILDE_STOW_BACKUP_DIR:-$SCRATCH/stow-backups}" "$@"
 }

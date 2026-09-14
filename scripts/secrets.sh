@@ -230,10 +230,16 @@ modes = dict(e.split(":") for e in spec.split())
 data = json.load(open(plain))
 for name, content in sorted(data.items()):
     path = os.path.join(ssh_dir, name)
-    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    mode = int(modes.get(name, "600"), 8)
+    # Write to a sibling and rename over the target. Opening the target
+    # directly fails when it already exists read-only (0400 is a common way to
+    # harden an ssh key), which would leave the file stale and the mode wrong.
+    tmp = path + ".tilde-tmp"
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as fh:
         fh.write(content)
-    os.chmod(path, int(modes.get(name, "600"), 8))
+    os.chmod(tmp, mode)
+    os.replace(tmp, path)
     print("  wrote %s (%s)" % (name, modes.get(name, "600")))
 PY
   info "Unsealed into ${SSH_DIR#"$REPO_DIR"/}"

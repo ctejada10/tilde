@@ -5,7 +5,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DOTFILES_DIR="$REPO_DIR/dotfiles"
 TARGET_DIR="$HOME"
-BACKUP_DIR="$REPO_DIR/scripts/stow-backups/$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR="${TILDE_STOW_BACKUP_DIR:-$REPO_DIR/scripts/stow-backups/$(date +%Y%m%d-%H%M%S)}"
 
 usage() {
   echo "Usage: $(basename "$0") [package ...]"
@@ -30,11 +30,23 @@ fi
 # scripts/stow-backups/<timestamp>/. Files already linked to this repo are
 # left alone.
 backup_conflicts() {
-  local pkg="$1" rel target dest
+  local pkg="$1" rel target dest resolved
   while IFS= read -r rel; do
     target="$TARGET_DIR/$rel"
     [ -e "$target" ] || [ -L "$target" ] || continue
     [ "$target" -ef "$DOTFILES_DIR/$pkg/$rel" ] && continue
+
+    # Refuse to move anything that actually lives inside this repo. Once a
+    # directory like ~/.ssh has been folded into a symlink pointing here,
+    # "$HOME/.ssh/config" resolves back into dotfiles/ — and moving it would
+    # destroy the source of truth rather than back up a stray file.
+    resolved="$(cd "$(dirname "$target")" 2>/dev/null && pwd -P)/$(basename "$target")"
+    case "$resolved" in
+      "$REPO_DIR"/*)
+        echo "  skipping $rel — it resolves into the repo itself"
+        continue
+        ;;
+    esac
     dest="$BACKUP_DIR/$pkg/$rel"
     mkdir -p "$(dirname "$dest")"
     echo "  conflict: backing up $target -> $dest"

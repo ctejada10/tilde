@@ -99,7 +99,7 @@ make_fake_home "$FAKE"
 # Phase 1 leaves an oh-my-zsh template .zshrc behind on a fresh machine.
 printf 'source $ZSH/oh-my-zsh.sh\n' > "$FAKE/.zshrc"
 STOW_OUT="$SCRATCH/stow.log"
-HOME="$FAKE" bash "$REPO_DIR/scripts/.stow" > "$STOW_OUT" 2>&1
+HOME="$FAKE" TILDE_STOW_BACKUP_DIR="$SCRATCH/stow-backups" bash "$REPO_DIR/scripts/.stow" > "$STOW_OUT" 2>&1
 stow_rc=$?
 
 it "stows every package without error"
@@ -119,8 +119,34 @@ else
   _fail "dot-config folded, or ghostty not linked inside it"
 fi
 
+it "refuses to back up a file that resolves into the repo itself"
+# The real danger shape: a parent directory in $HOME is already a symlink
+# pointing into this repo (exactly what stow folding produces for ~/.ssh), so
+# "$HOME/.zsh/aliases.zsh" resolves back here. Backing it up would move the
+# source of truth out of the repo. Uses a disposable probe directory.
+PROBE_DIR="$REPO_DIR/.stow-guard-probe"
+rm -rf "$PROBE_DIR"; mkdir -p "$PROBE_DIR"
+for f in aliases.zsh exports.zsh functions.zsh; do printf 'probe\n' > "$PROBE_DIR/$f"; done
+FAKE_G="$SCRATCH/home-guard"
+make_fake_home "$FAKE_G"
+ln -s "$PROBE_DIR" "$FAKE_G/.zsh"          # as if stow had folded it here
+GUARD_LOG="$SCRATCH/guard.log"
+HOME="$FAKE_G" TILDE_STOW_BACKUP_DIR="$SCRATCH/guard-backups" \
+  bash "$REPO_DIR/scripts/.stow" zsh > "$GUARD_LOG" 2>&1
+n="$(find "$PROBE_DIR" -type f 2>/dev/null | wc -l | tr -d ' ')"
+if [ "$n" = "3" ]; then
+  _pass
+else
+  _fail "$((3 - n)) probe file(s) were moved out of the repo"
+  find "$SCRATCH/guard-backups" -type f -name '*.zsh' -exec cp {} "$PROBE_DIR/" \; 2>/dev/null
+fi
+
+it "and says why it skipped them"
+has "$GUARD_LOG" "resolves into the repo itself"
+rm -rf "$PROBE_DIR"   # always, pass or fail
+
 it "is idempotent — a second run finds no conflicts"
-HOME="$FAKE" bash "$REPO_DIR/scripts/.stow" > "$SCRATCH/stow2.log" 2>&1
+HOME="$FAKE" TILDE_STOW_BACKUP_DIR="$SCRATCH/stow-backups" bash "$REPO_DIR/scripts/.stow" > "$SCRATCH/stow2.log" 2>&1
 eq "0" "$(grep -c 'conflict: backing up' "$SCRATCH/stow2.log")"
 
 ###############################################################################
