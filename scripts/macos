@@ -112,8 +112,8 @@ defaults_set_host -globalDomain NSStatusItemSpacing int 6
 # Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
 ###############################################################################
 
-# Disable “natural” (Lion-style) scrolling
-defaults_set NSGlobalDomain com.apple.swipescrolldirection bool false
+# Use “natural” (Lion-style) scrolling
+defaults_set NSGlobalDomain com.apple.swipescrolldirection bool true
 
 # Increase sound quality for Bluetooth headphones/headsets
 defaults_set com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" int 40
@@ -217,8 +217,8 @@ defaults_set_sudo /Library/Preferences/com.apple.windowserver DisplayResolutionE
 ###############################################################################
 
 # Set Home as the default location for new Finder windows
-# For other paths, use `PfLo` and `file:///full/path/here/`
-defaults_set com.apple.finder NewWindowTarget string "PfDe"
+# PfHm = Home, PfDe = Desktop. For other paths use `PfLo` with a file:// path.
+defaults_set com.apple.finder NewWindowTarget string "PfHm"
 defaults_set com.apple.finder NewWindowTargetPath string "file://${HOME}/"
 
 # Finder: show all filename extensions
@@ -296,8 +296,8 @@ defaults_set com.apple.dock mru-spaces bool false
 # Make Dock icons of hidden applications translucent
 defaults_set com.apple.dock showhidden bool true
 
-# Don’t show recent applications in Dock
-defaults_set com.apple.dock show-recents bool false
+# Show recent applications in the Dock
+defaults_set com.apple.dock show-recents bool true
 
 # Reset Launchpad, but keep the desktop wallpaper intact
 run find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
@@ -306,59 +306,15 @@ run find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -
 # Safari & WebKit                                                             #
 ###############################################################################
 
-# Privacy: don’t send search queries to Apple
-defaults_set com.apple.Safari UniversalSearchEnabled bool false
-defaults_set com.apple.Safari SuppressSearchSuggestions bool true
-
-# Prevent Safari from opening ‘safe’ files automatically after downloading
-defaults_set com.apple.Safari AutoOpenSafeDownloads bool false
-
-# Hide Safari’s bookmarks bar by default
-defaults_set com.apple.Safari ShowFavoritesBar bool false
-
-# Hide Safari’s sidebar in Top Sites
-defaults_set com.apple.Safari ShowSidebarInTopSites bool false
-
-# Disable Safari’s thumbnail cache for History and Top Sites
-defaults_set com.apple.Safari DebugSnapshotsUpdatePolicy int 2
-
-# Make Safari’s search banners default to Contains instead of Starts With
-defaults_set com.apple.Safari FindOnPageMatchesWordStartsOnly bool false
-
-# Remove useless icons from Safari’s bookmarks bar
-defaults_always defaults write com.apple.Safari ProxiesInBookmarksBar "()"
+# Safari's own preferences live in a sandboxed container that `defaults` cannot
+# reach on current macOS — `defaults read com.apple.Safari` returns nothing at
+# all on this machine, so every write to that domain was inert. Configure
+# Safari from its own settings instead.
+#
+# This one goes to the global domain and does apply.
 
 # Add a context menu item for showing the Web Inspector in web views
 defaults_set NSGlobalDomain WebKitDeveloperExtras bool true
-
-# Enable continuous spellchecking
-defaults_set com.apple.Safari WebContinuousSpellCheckingEnabled bool true
-# Disable auto-correct
-defaults_set com.apple.Safari WebAutomaticSpellingCorrectionEnabled bool false
-
-# Disable AutoFill
-defaults_set com.apple.Safari AutoFillFromAddressBook bool false
-defaults_set com.apple.Safari AutoFillPasswords bool false
-defaults_set com.apple.Safari AutoFillCreditCardData bool false
-defaults_set com.apple.Safari AutoFillMiscellaneousForms bool false
-
-# Warn about fraudulent websites
-defaults_set com.apple.Safari WarnAboutFraudulentWebsites bool true
-
-# Disable Java
-defaults_set com.apple.Safari WebKitJavaEnabled bool false
-defaults_set com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabled bool false
-defaults_set com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabledForLocalFiles bool false
-
-# Block pop-up windows
-defaults_set com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically bool false
-defaults_set com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically bool false
-
-# Enable “Do Not Track”
-defaults_set com.apple.Safari SendDoNotTrackHTTPHeader bool true
-
-# Update extensions automatically
-defaults_set com.apple.Safari InstallExtensionUpdatesAutomatically bool true
 
 ###############################################################################
 # Time Machine                                                                #
@@ -380,8 +336,8 @@ defaults_set com.apple.ActivityMonitor OpenMainWindow bool true
 # Visualize CPU usage in the Activity Monitor Dock icon
 # defaults write com.apple.ActivityMonitor IconType -int 5
 
-# Show all processes in Activity Monitor
-defaults_set com.apple.ActivityMonitor ShowCategory int 0
+# Show my processes in Activity Monitor
+defaults_set com.apple.ActivityMonitor ShowCategory int 100
 
 # Sort Activity Monitor results by CPU usage
 defaults_set com.apple.ActivityMonitor SortColumn string "CPUUsage"
@@ -390,12 +346,6 @@ defaults_set com.apple.ActivityMonitor SortDirection int 0
 ###############################################################################
 # Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
 ###############################################################################
-
-# Use plain text mode for new TextEdit documents
-defaults_set com.apple.TextEdit RichText int 0
-# Open and save files as UTF-8 in TextEdit
-defaults_set com.apple.TextEdit PlainTextEncoding int 4
-defaults_set com.apple.TextEdit PlainTextEncodingForWrite int 4
 
 # Auto-play videos when opened with QuickTime Player
 defaults_set com.apple.QuickTimePlayerX MGPlayMovieOnOpen bool true

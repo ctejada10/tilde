@@ -12,6 +12,8 @@ DEFAULTS_CHANGED=0
 DEFAULTS_UNCHANGED=0
 DEFAULTS_FORCED=0
 DEFAULTS_CHECK="${DEFAULTS_CHECK:-0}"
+DEFAULTS_UNREADABLE="__tilde_unreadable__"
+DEFAULTS_UNKNOWN=0
 
 # Normalise a value so "true"/"YES"/1 compare equal to what `defaults read`
 # gives back for a boolean (which is 1 or 0).
@@ -30,7 +32,14 @@ _defaults_read() {
   case "$1" in
     user) defaults read "$2" "$3" 2>/dev/null ;;
     host) defaults -currentHost read "$2" "$3" 2>/dev/null ;;
-    sudo) sudo -n defaults read "$2" "$3" 2>/dev/null ;;
+    sudo)
+      # A failed sudo read must not look like an unset value, or every
+      # system-domain setting is reported as drift.
+      if sudo -n true 2>/dev/null; then
+        sudo -n defaults read "$2" "$3" 2>/dev/null
+      else
+        printf '%s' "$DEFAULTS_UNREADABLE"
+      fi ;;
   esac
 }
 
@@ -46,7 +55,13 @@ _defaults_apply() {
   local mode="$1" domain="$2" key="$3" type="$4" value="$5"
   local current want
 
-  current="$(_defaults_norm "$type" "$(_defaults_read "$mode" "$domain" "$key")")"
+  current="$(_defaults_read "$mode" "$domain" "$key")"
+  if [ "$current" = "$DEFAULTS_UNREADABLE" ]; then
+    printf '  ?          %s %s (needs sudo to read)\n' "$domain" "$key"
+    DEFAULTS_UNKNOWN=$((DEFAULTS_UNKNOWN + 1))
+    return 0
+  fi
+  current="$(_defaults_norm "$type" "$current")"
   want="$(_defaults_norm "$type" "$value")"
 
   if [ "$current" = "$want" ]; then
@@ -98,8 +113,8 @@ run() {
 defaults_summary() {
   printf '\n%s\n' "────────────────────────────────────────"
   if [ "$DEFAULTS_CHECK" = "1" ]; then
-    printf 'dry run: %s would change, %s already correct, %s applied unconditionally\n' \
-      "$DEFAULTS_CHANGED" "$DEFAULTS_UNCHANGED" "$DEFAULTS_FORCED"
+    printf 'dry run: %s would change, %s already correct, %s applied unconditionally, %s unreadable\n' \
+      "$DEFAULTS_CHANGED" "$DEFAULTS_UNCHANGED" "$DEFAULTS_FORCED" "$DEFAULTS_UNKNOWN"
   else
     printf 'defaults: %s changed, %s already correct, %s applied unconditionally\n' \
       "$DEFAULTS_CHANGED" "$DEFAULTS_UNCHANGED" "$DEFAULTS_FORCED"
