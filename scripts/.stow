@@ -5,6 +5,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DOTFILES_DIR="$REPO_DIR/dotfiles"
 TARGET_DIR="$HOME"
+BACKUP_DIR="$REPO_DIR/scripts/stow-backups/$(date +%Y%m%d-%H%M%S)"
 
 usage() {
   echo "Usage: $(basename "$0") [package ...]"
@@ -25,15 +26,47 @@ else
   done
 fi
 
+# Move anything that would make `stow` fail out of the way, into
+# scripts/stow-backups/<timestamp>/. Files already linked to this repo are
+# left alone.
+backup_conflicts() {
+  local pkg="$1" rel target dest
+  while IFS= read -r rel; do
+    target="$TARGET_DIR/$rel"
+    [ -e "$target" ] || [ -L "$target" ] || continue
+    [ "$target" -ef "$DOTFILES_DIR/$pkg/$rel" ] && continue
+    dest="$BACKUP_DIR/$pkg/$rel"
+    mkdir -p "$(dirname "$dest")"
+    echo "  conflict: backing up $target -> $dest"
+    mv "$target" "$dest"
+  done < <(cd "$DOTFILES_DIR/$pkg" && find . \( -type f -o -type l \) | sed 's|^\./||')
+}
+
+# Directories that are shared with other tools must exist before stowing,
+# otherwise stow "folds" the whole directory into a single symlink pointing at
+# one package and everything else ends up writing into this repo.
+mkdir -p "$TARGET_DIR/.config"
+
 cd "$DOTFILES_DIR"
 
+failed=""
 for pkg in "${packages[@]}"; do
   if [[ ! -d "$DOTFILES_DIR/$pkg" ]]; then
     echo "Warning: package not found: $pkg — skipping"
     continue
   fi
   echo "Stowing $pkg..."
-  stow -v -t "$TARGET_DIR" "$pkg"
+  backup_conflicts "$pkg"
+  if ! stow -v -t "$TARGET_DIR" "$pkg"; then
+    echo "  ERROR: stow failed for $pkg"
+    failed="$failed $pkg"
+  fi
 done
+
+if [[ -n "$failed" ]]; then
+  echo ""
+  echo "Failed packages:$failed"
+  exit 1
+fi
 
 echo "Done."
