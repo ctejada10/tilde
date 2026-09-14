@@ -3,7 +3,6 @@
 # ~/.macos — https://mths.be/macos
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Ask for the administrator password upfront
 sudo -v
@@ -25,6 +24,16 @@ source "$SCRIPT_DIR/.brew"
 # Install oh-my-zsh without modifying .zshrc (stow manages that)
 RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# KEEP_ZSHRC only protects an *existing* .zshrc. On a fresh machine there is
+# none, so the installer drops its own template in place — which would then
+# make `stow zsh` fail with a conflict in phase 2. Remove the template.
+if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ] \
+   && grep -q "oh-my-zsh.sh" "$HOME/.zshrc" \
+   && ! grep -q "MNML_PROMPT" "$HOME/.zshrc"; then
+  echo "Removing the oh-my-zsh template ~/.zshrc so stow can link ours."
+  rm -f "$HOME/.zshrc"
+fi
 
 ###############################################################################
 # OS Settings                                                                 #
@@ -165,8 +174,18 @@ sudo chflags uchg /private/var/vm/sleepimage
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Save screenshots to pictures/screenshots
-defaults write com.apple.screencapture location -string "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Temporary Files/media/screenshots"
+# Save screenshots to iCloud Drive. macOS silently ignores this if the folder
+# does not exist, and iCloud Drive only appears once you have signed in — so
+# only set it when iCloud Drive is actually there.
+SCREENSHOT_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Temporary Files/media/screenshots"
+if [ -d "$HOME/Library/Mobile Documents/com~apple~CloudDocs" ]; then
+	mkdir -p "$SCREENSHOT_DIR"
+	defaults write com.apple.screencapture location -string "$SCREENSHOT_DIR"
+else
+	echo "iCloud Drive not set up yet — skipping screenshot location."
+	echo "After signing into iCloud, run:"
+	echo "  mkdir -p \"$SCREENSHOT_DIR\" && defaults write com.apple.screencapture location -string \"$SCREENSHOT_DIR\" && killall SystemUIServer"
+fi
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
 defaults write com.apple.screencapture type -string "png"
@@ -418,18 +437,22 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 # Hide unused directories from ~                                              #
 ###############################################################################
 
-chflags hidden ~/Music
-chflags hidden ~/Databases
-chflags hidden ~/.DS_Store
-chflags hidden ~/Pictures
-chflags hidden ~/Library
-chflags hidden ~/Public
-chflags hidden ~/Movies
-chflags hidden ~/Applications
+for dir in ~/Music ~/Databases ~/.DS_Store ~/Pictures ~/Library ~/Public ~/Movies ~/Applications; do
+	[ -e "$dir" ] && chflags hidden "$dir"
+done
+
+###############################################################################
+# Downloads structure                                                         #
+###############################################################################
+
+mkdir -p ~/Downloads/Documents ~/Downloads/Media/Images ~/Downloads/Media/Videos
 
 ###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################
+# NOTE: "Terminal" is deliberately absent. This script is launched from
+# Terminal, so killing it kills the script — that is why everything after this
+# block silently failed to run on the previous install.
 
 for app in "Activity Monitor" \
 	"Address Book" \
@@ -448,7 +471,6 @@ for app in "Activity Monitor" \
 	"SizeUp" \
 	"Spectacle" \
 	"SystemUIServer" \
-	"Terminal" \
 	"Transmission" \
 	"Tweetbot" \
 	"Twitter" \
@@ -456,6 +478,5 @@ for app in "Activity Monitor" \
 	killall "${app}" &> /dev/null
 done
 
-mkdir -p ~/Downloads/Documents ~/Downloads/Media/Images ~/Downloads/Media/Videos
 
 echo "Done. Note that some of these changes require a logout/restart to take effect."
