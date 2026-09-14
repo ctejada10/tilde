@@ -1,4 +1,9 @@
+# Taps
+tap "hudochenkov/sshpass"
+tap "thedavidweng/tap"
+
 # Binaries
+brew "age"
 brew "bat"
 brew "btop"
 brew "coreutils"
@@ -8,26 +13,36 @@ brew "exiftool"
 brew "eza"
 brew "ffmpeg"
 brew "fzf"
+brew "gh"
 brew "git"
 brew "git-flow"
-brew "gnutls"
 brew "gnupg"
+brew "gnutls"
 brew "grep"
 brew "hidapi"
 brew "htop"
+brew "hudochenkov/sshpass/sshpass", trusted: true
 brew "imagemagick"
 brew "jq"
 brew "mas"
+brew "mole"
 brew "p7zip"
 brew "pandoc"
+brew "pinentry"
+brew "pinentry-mac"
+brew "poppler"
 brew "python@3.14"
 brew "rclone"
 brew "rmlint"
 brew "rsync"
+brew "ruff"
+brew "shellcheck"
+brew "sops"
 brew "stow"
 brew "tailscale", link: false
 brew "tmux"
 brew "tree"
+brew "uv"
 brew "virtualenvwrapper"
 brew "zoxide"
 
@@ -36,11 +51,14 @@ cask "1password"
 cask "1password-cli"
 cask "adguard"
 cask "adobe-creative-cloud"
+cask "aldente"
 cask "alt-tab"
 cask "appcleaner"
 cask "bambu-studio"
 cask "beeper"
 cask "claude"
+cask "claude-code"
+cask "cleanshot"
 cask "devonthink"
 cask "docker-desktop"
 cask "dropbox"
@@ -48,17 +66,21 @@ cask "ente-auth"
 cask "fantastical"
 cask "flux-app"
 cask "ghostty"
+cask "google-chrome"
 cask "hazel"
 cask "iina"
 cask "latest"
 cask "logi-options+"
+cask "lunar"
 cask "mactex-no-gui"
+cask "miniconda"
 cask "obsidian"
-cask "rar"
 cask "raycast"
 cask "rectangle-pro"
 cask "slack"
 cask "tailscale-app"
+cask "thebrowsercompany-dia"
+cask "thedavidweng/tap/monarchmoney-cli", trusted: true
 cask "todoist-app"
 cask "visual-studio-code"
 cask "zoom"
@@ -72,7 +94,6 @@ cask "font-iosevka"
 cask "font-jetbrains-mono"
 cask "font-junction"
 cask "font-latin-modern"
-cask "font-lato"
 cask "font-open-sans"
 cask "font-raleway"
 cask "font-roboto"
@@ -82,6 +103,7 @@ cask "font-source-code-pro-for-powerline"
 # Mac App Store
 mas "1Password for Safari", id: 1569813296
 mas "Actions", id: 1586435171
+mas "Bear", id: 1091189122
 mas "CardPointers", id: 1472875808
 mas "DaisyDisk", id: 411643860
 mas "Data Jar", id: 1453273600
@@ -94,6 +116,7 @@ mas "Monarch Money Tweaks", id: 6753774259
 mas "No Youtube Shorts", id: 6502996298
 mas "Numbers", id: 361304891
 mas "OverPicture", id: 1188020834
+mas "Pages", id: 361309726
 mas "Parcel", id: 375589283
 mas "Play", id: 1596506190
 mas "Raycast Companion", id: 6738274497
@@ -103,7 +126,6 @@ mas "Sink It", id: 6449873635
 mas "Sleeve", id: 1606145041
 mas "SponsorBlock", id: 1573461917
 mas "Timery", id: 1425368544
-mas "Userscripts-Mac-App", id: 1463298887
 
 # Visual Studio Code extensions
 vscode "aaron-bond.better-comments"
