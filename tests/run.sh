@@ -275,6 +275,48 @@ no env SOPS_AGE_KEY_FILE="$SBOX/nonexistent.txt" TILDE_SSH_DIR="$SBOX/ssh"      
 it ".sops.yaml points at a real age recipient"
 has "$REPO_DIR/.sops.yaml" 'age1'
 
+it "locks the age key under a passphrase"
+PASS='six random words go here please'
+LOCKED="$SBOX/age-key.age"
+with_tty "$PASS\n$PASS\n" env SOPS_AGE_KEY_FILE="$SBOX/age.txt" TILDE_LOCKED_KEY="$LOCKED" \
+  bash "$SEC" lock-key
+ok test -s "$LOCKED"
+
+it "the locked key is an age file, not plaintext"
+has "$LOCKED" 'age-encryption.org'
+
+it "the locked key holds no plaintext key material"
+hasnt "$LOCKED" 'AGE-SECRET'
+
+it "unlocks back to the identical key with the right passphrase"
+RESTORED="$SBOX/restored.txt"
+with_tty "$PASS\n" env SOPS_AGE_KEY_FILE="$RESTORED" TILDE_LOCKED_KEY="$LOCKED" \
+  bash "$SEC" unlock-key
+if [ -f "$RESTORED" ] && cmp -s "$SBOX/age.txt" "$RESTORED"; then _pass; else _fail "key did not round trip"; fi
+
+it "restores the unlocked key as 600"
+eq "600" "$(stat -f '%OLp' "$RESTORED" 2>/dev/null)"
+
+it "rejects the wrong passphrase"
+WRONG="$SBOX/wrong-restore.txt"
+with_tty "definitely not the passphrase\n" env SOPS_AGE_KEY_FILE="$WRONG" TILDE_LOCKED_KEY="$LOCKED" \
+  bash "$SEC" unlock-key
+no test -f "$WRONG"
+
+it "bootstrap prefers an age key that is already present"
+out="$(env SOPS_AGE_KEY_FILE="$SBOX/age.txt" TILDE_LOCKED_KEY="$LOCKED" \
+        TILDE_SSH_DIR="$SBOX/ssh" TILDE_SECRETS_FILE="$SBOX/sealed.enc.json" \
+        bash "$SEC" bootstrap 2>&1)"
+case "$out" in *"already on this machine"*) _pass ;; *) _fail "did not use the local key: $out" ;; esac
+
+it "bootstrap falls back to the locked key when none is present"
+rm -f "$SBOX/gone.txt"
+with_tty "$PASS\n" env SOPS_AGE_KEY_FILE="$SBOX/gone.txt" TILDE_LOCKED_KEY="$LOCKED" \
+  TILDE_SSH_DIR="$SBOX/ssh" TILDE_SECRETS_FILE="$SBOX/sealed.enc.json" \
+  TILDE_OP_ITEM="no-such-item-$$" \
+  bash "$SEC" bootstrap
+ok test -f "$SBOX/gone.txt"
+
 it "no plaintext private key material is tracked in git"
 # Pattern assembled from fragments so this file does not match itself.
 _k1='BEGIN (OPENSSH|RSA|EC|DSA|PGP) PRIVATE'

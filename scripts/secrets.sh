@@ -7,7 +7,9 @@
 #   secrets.sh unseal     decrypt secrets/ back into dotfiles/ssh/.ssh (new machine)
 #   secrets.sh op-store   save the age key to 1Password (do this before wiping)
 #   secrets.sh op-fetch   pull the age key from 1Password onto this machine
-#   secrets.sh bootstrap  op-fetch + unseal, i.e. what a new machine runs
+#   secrets.sh lock-key   encrypt the age key with a passphrase you memorise
+#   secrets.sh unlock-key restore the age key by typing that passphrase
+#   secrets.sh bootstrap  get the age key by any means, then unseal
 #
 # The chain is: 1Password holds the age key -> the age key decrypts secrets/ ->
 # secrets/ holds the SSH keys. 1Password is the only thing you have to sign
@@ -17,6 +19,7 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SECRETS_FILE="${TILDE_SECRETS_FILE:-$REPO_DIR/secrets/ssh.enc.json}"
+LOCKED_KEY="${TILDE_LOCKED_KEY:-$REPO_DIR/secrets/age-key.age}"
 SSH_DIR="${TILDE_SSH_DIR:-$REPO_DIR/dotfiles/ssh/.ssh}"
 AGE_KEY_FILE="${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
 OP_VAULT="${TILDE_OP_VAULT:-Private}"
@@ -116,6 +119,56 @@ op_fetch() {
 }
 
 ###############################################################################
+# Passphrase-locked age key                                                   #
+###############################################################################
+# The age key encrypted under a passphrase that exists only in your head. This
+# is what makes a new machine self-sufficient: the blob ships in the repo, so
+# one prompt is the entire manual step - no Dropbox, no 1Password, no GUI.
+#
+# Note this ciphertext is public and therefore attackable offline forever.
+# Use a long passphrase; six random words beats a clever short one.
+lock_key() {
+  need age
+  [ -f "$AGE_KEY_FILE" ] || die "no age key at $AGE_KEY_FILE to lock"
+  mkdir -p "$(dirname "$LOCKED_KEY")"
+  info "Choose a passphrase for the age key. You will need it on every new"
+  info "machine, and it is not recoverable - 1Password stays as the backup."
+  age -p -o "$LOCKED_KEY" "$AGE_KEY_FILE" || die "age refused to encrypt the key"
+  info "Locked to ${LOCKED_KEY#"$REPO_DIR"/} (public key: $(age_recipient))"
+}
+
+unlock_key() {
+  need age
+  [ -f "$LOCKED_KEY" ] || die "no locked key at $LOCKED_KEY"
+  mkdir -p "$(dirname "$AGE_KEY_FILE")"
+  local tmp
+  tmp="$(mktemp)"
+  if ! age -d -o "$tmp" "$LOCKED_KEY"; then
+    rm -f "$tmp"
+    die "could not decrypt the age key - wrong passphrase?"
+  fi
+  grep -q "AGE-SECRET-KEY" "$tmp" || { rm -f "$tmp"; die "decrypted blob is not an age key"; }
+  install -m 600 "$tmp" "$AGE_KEY_FILE"
+  rm -f "$tmp"
+  info "Unlocked the age key (public key: $(age_recipient))"
+}
+
+# Get a usable age key by whatever means are available, cheapest first.
+resolve_key() {
+  if [ -f "$AGE_KEY_FILE" ]; then
+    info "Using the age key already on this machine."
+    return 0
+  fi
+  if [ -f "$LOCKED_KEY" ]; then
+    info "Unlocking the age key from ${LOCKED_KEY#"$REPO_DIR"/}"
+    unlock_key
+    return 0
+  fi
+  info "No local or locked key; trying 1Password..."
+  op_fetch
+}
+
+###############################################################################
 # sops                                                                        #
 ###############################################################################
 seal() {
@@ -193,6 +246,7 @@ status() {
   else
     printf 'age public key (missing)\n'
   fi
+  printf 'locked age key %s\n' "$([ -f "$LOCKED_KEY" ] && echo "${LOCKED_KEY#"$REPO_DIR"/}" || echo '(none)')"
   printf 'sealed file    %s\n' "$([ -f "$SECRETS_FILE" ] && echo "${SECRETS_FILE#"$REPO_DIR"/}" || echo '(none)')"
   printf '1Password      %s\n' "$(op_ready 2>/dev/null && echo 'connected' || echo 'not connected')"
   printf 'vault/item     %s / %s\n' "$OP_VAULT" "$OP_ITEM"
@@ -202,8 +256,10 @@ case "${1:-}" in
   status)    status ;;
   seal)      seal ;;
   unseal)    unseal ;;
+  lock-key)   lock_key ;;
+  unlock-key) unlock_key ;;
   op-store)  op_store ;;
   op-fetch)  op_fetch ;;
-  bootstrap) op_fetch; unseal ;;
-  *)         sed -n '3,14p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+  bootstrap) resolve_key; unseal ;;
+  *)         sed -n "3,16p" "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

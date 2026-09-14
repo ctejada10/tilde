@@ -65,6 +65,18 @@ make_fake_home() {
   ln -s "$(dirname "$REPO_DIR")" "$fake/Library/CloudStorage/Dropbox/repositories"
 }
 
+# Drive a command that insists on a real terminal (age -p), feeding it lines.
+with_tty() {
+  local input="$1"; shift
+  # Hard timeout: a command that decides to prompt again must fail the test,
+  # never wedge the suite.
+  if command -v timeout >/dev/null 2>&1; then
+    printf '%b' "$input" | timeout 20 script -q /dev/null "$@" >/dev/null 2>&1
+  else
+    printf '%b' "$input" | script -q /dev/null "$@" >/dev/null 2>&1
+  fi
+}
+
 # Run a command with a clean environment, as a fresh login shell would.
 in_fake_home() {
   local fake="$1"; shift

@@ -53,20 +53,34 @@ names are readable so you can see what is stored; the values are not.
 The age key that decrypts them is kept in 1Password and nowhere else:
 
 ```sh
-scripts/secrets.sh status     # what is configured
-scripts/secrets.sh seal       # encrypt dotfiles/ssh/.ssh into secrets/
-scripts/secrets.sh op-store   # save the age key to 1Password
-scripts/secrets.sh bootstrap  # on a new machine: fetch the key, decrypt
+scripts/secrets.sh status      # what is configured
+scripts/secrets.sh seal        # encrypt dotfiles/ssh/.ssh into secrets/
+scripts/secrets.sh lock-key    # encrypt the age key under a memorised passphrase
+scripts/secrets.sh op-store    # also save the age key to 1Password, as backup
+scripts/secrets.sh bootstrap   # on a new machine: get the key, decrypt everything
 ```
 
-**The first 1Password sign-in cannot be automated.** Unlocking needs a human
-(account password plus Secret Key from your Emergency Kit, or Touch ID) or a
-service-account token, and a token on a freshly wiped machine would have to
-come from somewhere itself. What *is* automated is everything after that: once
-the desktop app is signed in and **Settings → Developer → Integrate with
-1Password CLI** is ticked, `op` unlocks with Touch ID and the scripts run
-without anyone typing a secret. `secrets.sh` detects which state you are in and
-says what to do.
+`bootstrap` finds the age key by the cheapest route available:
+
+1. a key already on the machine,
+2. `secrets/age-key.age`, unlocked with the passphrase you memorised — one
+   prompt, and it ships in the repo, so this works before Dropbox has synced
+   and without touching 1Password,
+3. 1Password, as the fallback if you ever forget the passphrase.
+
+That first prompt is the only manual step. Everything after it is automatic.
+
+**The passphrase protects a file that is public.** The ciphertext can be
+attacked offline forever, so use a long one — six random words beats anything
+short and clever. If you forget it, route 3 is what saves you, which is why
+`op-store` is worth doing as well.
+
+For the 1Password fallback route, the CLI has to be connected first: sign into
+the desktop app, then tick **Settings → Developer → Integrate with 1Password
+CLI**. After that `op` unlocks with Touch ID. That first app sign-in needs your
+account password and Secret Key from your Emergency Kit and cannot be
+automated — which is exactly why the passphrase route exists as the primary
+path.
 
 Set `OP_SERVICE_ACCOUNT_TOKEN` to skip the interactive path entirely, for a
 scripted or CI rebuild.
