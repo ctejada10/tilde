@@ -12,15 +12,37 @@ I use this repository to set up all my computers, Ubuntu and macOS, from a fresh
 curl -fsSL https://raw.githubusercontent.com/ctejada10/tilde/master/setup.sh | bash
 ```
 
-This installs Xcode CLT, Homebrew, all Brewfile packages (including Dropbox), and applies macOS settings.
+This installs Xcode CLT and Homebrew, installs everything in the Brewfile
+(binaries, casks, fonts, Mac App Store apps, VS Code extensions — Dropbox
+included), installs oh-my-zsh, and applies the macOS defaults.
 
-**Phase 2** — after signing into Dropbox and waiting for sync:
+Mac App Store apps need you to be signed in to the App Store. If you were not,
+sign in and re-run:
+
+```sh
+brew bundle install --file=~/Repositories/tilde/scripts/Brewfile
+```
+
+**Phase 2** — sign into Dropbox, wait for `repositories/` to finish syncing, then:
 
 ```sh
 bash ~/Library/CloudStorage/Dropbox/repositories/tilde/scripts/finish.sh
 ```
 
-This creates the `~/Repositories` symlink (pointing to the Dropbox repositories folder) and links all dotfiles via stow.
+This creates the `~/Repositories` and `~/src` symlinks (both pointing at the
+Dropbox repositories folder), links all dotfiles with stow, repairs the SSH key
+permissions Dropbox does not preserve, installs the MonoLisa fonts, and
+verifies every link.
+
+Anything already in `$HOME` that would collide with a stowed file is moved to
+`scripts/stow-backups/<timestamp>/` rather than silently overwritten.
+
+**Phase 3** — the manual leftovers:
+
+  - Import Raycast settings from `assets/raycast.rayconfig`.
+  - Check `ssh -T git@github.com` works, then `git log --show-signature -1` to
+    confirm commit signing.
+  - Restart to let the remaining macOS defaults take effect.
 
 ## Fresh macOS install
 This repository assumes we're working with a fresh OS install, but before we go formatting drives, we should make sure we didn't forget anything, like:
@@ -28,25 +50,17 @@ This repository assumes we're working with a fresh OS install, but before we go 
 ### Before you install
 
   - Did you commit and push any changes/branches to your git repositories?
+  - **Did you push this repository?** Phase 1 clones `master` from GitHub, so
+    any unpushed fix to `scripts/` will not run on the new machine.
+  - Did you run `scripts/update-brewfile.sh` and commit the result, so the
+    Brewfile matches what is actually installed?
   - Did you remember to save all important documents from non-iCloud directories?
   - Did you save all of your work from apps which aren't synced through iCloud?
   - Did you remember to export important data from your local database?
-  - Did you update [mackup](https://github.com/lra/mackup) to the latest version and ran `mackup backup`?
 
 ### Installing macOS
 
 After going to our checklist above and making sure you backed everything up, we're going to cleanly install macOS with the latest release. Follow [this article](https://www.imore.com/how-do-clean-install-macos) to cleanly install the latest macOS version.
-
-### Setting up
-
-Once we have our freshly installed Mac, we can proceed to install our dotfiles. To do so, we:
-
-  1. Update macOS.
-  2. [Generate a new public and private SSH key](https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) and add them to Github.
-  3. Clone this repo.
-  4. Run `scripts/macos` to setup and install pertinent apps and binaries.
-  5. After mackupris synced with your cloud storage, restore preferences by running `mackup restore`.
-  6. Restart your computer to finalize the process.
 
 ## Inspiration
 I took inspiration from various sources to build this setup. These are
