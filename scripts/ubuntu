@@ -37,9 +37,9 @@ cd "$REPO_DIR/scripts"
 chmod +x .apt
 ./.apt
 
-# 4. Stow dotfiles (btop, git, gpg, ssh, tmux, zsh)
+# 4. Stow dotfiles (git, gpg, ssh, tmux, zsh)
 cd "$REPO_DIR/dotfiles"
-for d in btop git gpg ssh tmux zsh; do
+for d in git gpg ssh tmux zsh; do
     if [ -d "$d" ]; then
         echo "[*] Stowing $d..."
         stow -t "$USER_HOME" "$d"
