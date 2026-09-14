@@ -236,7 +236,10 @@ no bash "$SEC" definitely-not-a-command
 SBOX="$SCRATCH/secrets"
 mkdir -p "$SBOX/ssh"
 age-keygen -o "$SBOX/age.txt" 2>/dev/null
-printf -- '-----BEGIN OPENSSH PRIVATE KEY-----\nSENTINEL-PRIVATE\n-----END OPENSSH PRIVATE KEY-----\n' > "$SBOX/ssh/arnor"
+# Built from parts so this file never contains a literal key header, which
+# would trip the leak guard below.
+_hdr='PRIVATE KEY'
+printf -- '-----BEGIN OPENSSH %s-----\nSENTINEL-MATERIAL\n-----END OPENSSH %s-----\n' "$_hdr" "$_hdr" > "$SBOX/ssh/arnor"
 printf 'ssh-ed25519 AAAATEST test@example.com\n' > "$SBOX/ssh/arnor.pub"
 chmod 600 "$SBOX/ssh/arnor"; chmod 644 "$SBOX/ssh/arnor.pub"
 
@@ -246,7 +249,7 @@ it "seals the ssh directory"
 ok sec seal
 
 it "the sealed file contains no plaintext key material"
-hasnt "$SBOX/sealed.enc.json" 'SENTINEL-PRIVATE'
+hasnt "$SBOX/sealed.enc.json" 'SENTINEL-MATERIAL'
 
 it "the sealed file still names which secrets it holds"
 has "$SBOX/sealed.enc.json" '"arnor"'
@@ -254,7 +257,7 @@ has "$SBOX/sealed.enc.json" '"arnor"'
 it "unseals back to identical content"
 rm -rf "$SBOX/ssh"
 sec unseal >/dev/null 2>&1
-has "$SBOX/ssh/arnor" 'SENTINEL-PRIVATE'
+has "$SBOX/ssh/arnor" 'SENTINEL-MATERIAL'
 
 it "restores 600 on the private key"
 eq "600" "$(stat -f '%OLp' "$SBOX/ssh/arnor" 2>/dev/null)"
@@ -271,5 +274,19 @@ no env SOPS_AGE_KEY_FILE="$SBOX/nonexistent.txt" TILDE_SSH_DIR="$SBOX/ssh"      
 
 it ".sops.yaml points at a real age recipient"
 has "$REPO_DIR/.sops.yaml" 'age1'
+
+it "no plaintext private key material is tracked in git"
+# Pattern assembled from fragments so this file does not match itself.
+_k1='BEGIN (OPENSSH|RSA|EC|DSA|PGP) PRIVATE'
+_k2='AGE-SECRET'
+leaks="$(cd "$REPO_DIR" && git grep -lE "${_k1} KEY|${_k2}-KEY-" -- . 2>/dev/null || true)"
+eq "" "$leaks"
+
+it "the sealed secrets file is tracked and encrypted"
+if [ -f "$REPO_DIR/secrets/ssh.enc.json" ]; then
+  if grep -q 'ENC\[AES256_GCM' "$REPO_DIR/secrets/ssh.enc.json"; then _pass; else _fail "not sops-encrypted"; fi
+else
+  _pass  # nothing sealed yet is fine
+fi
 
 summary

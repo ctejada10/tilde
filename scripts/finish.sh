@@ -54,6 +54,24 @@ SCRIPT_DIR="$REPO_DIR/scripts"
 chmod +x "$SCRIPT_DIR/ghostty.sh" "$SCRIPT_DIR/.stow" "$SCRIPT_DIR/finish.sh" \
          "$REPO_DIR/dotfiles/tmux/.tmux-window-name.sh" 2>/dev/null || true
 
+###############################################################################
+# Secrets                                                                     #
+###############################################################################
+# If the keys are sealed into git, restore them from there — 1Password holds
+# the age key. Falls back to whatever Dropbox synced, which is the old path.
+if [ -f "$REPO_DIR/secrets/ssh.enc.json" ]; then
+  echo ""
+  echo "Restoring SSH keys from the encrypted copy in git..."
+  if bash "$SCRIPT_DIR/secrets.sh" bootstrap; then
+    echo "Restored from git."
+  else
+    echo ""
+    echo "Could not restore from git — falling back to the copy Dropbox synced."
+    echo "Run '$SCRIPT_DIR/secrets.sh bootstrap' by hand once 1Password is set up."
+  fi
+  echo ""
+fi
+
 bash "$SCRIPT_DIR/.stow"
 
 ###############################################################################

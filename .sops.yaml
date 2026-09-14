@@ -1,0 +1,5 @@
+# Secrets in secrets/ are encrypted to this age key. The matching private key
+# lives only in 1Password; scripts/secrets.sh op-fetch retrieves it.
+creation_rules:
+  - path_regex: secrets/.*\.enc\.json$
+    age: age1qmu9ttwq35eqa34yl65368u83g98meaqk4pdgw6wkaq6d9e5mdtq3njavr
