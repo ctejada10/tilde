@@ -2,16 +2,30 @@
 
 # Install command-line tools using Homebrew.
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Check if Homebrew is installed
-if ! command -v brew &> /dev/null; then
+if ! command -v brew &>/dev/null; then
   echo "Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-else
-  echo "Homebrew is already installed"
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-BREW_PREFIX=$(brew --prefix)
-export PATH="$BREW_PREFIX/bin:$PATH"
+# The Homebrew installer does not add brew to the PATH of the running shell,
+# it only prints instructions. Do it ourselves so the rest of this script works.
+if ! command -v brew &>/dev/null; then
+  for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [ -x "$candidate" ]; then
+      eval "$("$candidate" shellenv)"
+      break
+    fi
+  done
+fi
+
+if ! command -v brew &>/dev/null; then
+  echo "Error: Homebrew installation failed — brew not found." >&2
+  exit 1
+fi
+echo "Using Homebrew at $(command -v brew)"
 
 # Make sure we're using the latest Homebrew.
 brew update
@@ -19,9 +33,15 @@ brew update
 # Upgrade any already-installed formulae.
 brew upgrade
 
-# Install all our dependencies with bundle (See Brewfile)
-brew tap homebrew/bundle
-brew bundle --file="$(dirname "$0")/Brewfile"
+# Install all our dependencies with bundle (See Brewfile).
+# Keep going if a single cask or Mac App Store item fails (e.g. not signed in
+# to the App Store) so one failure doesn't abort the whole install.
+if ! brew bundle install --file="$SCRIPT_DIR/Brewfile"; then
+  echo ""
+  echo "Warning: some Brewfile entries failed to install."
+  echo "Check the output above, then re-run: brew bundle install --file=$SCRIPT_DIR/Brewfile"
+  echo ""
+fi
 
 # Remove outdated versions from the cellar.
 brew cleanup
