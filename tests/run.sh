@@ -16,7 +16,8 @@ section "Lint"
 ###############################################################################
 for f in setup.sh scripts/macos scripts/ubuntu scripts/.brew scripts/.stow \
          scripts/.apt scripts/finish.sh scripts/ghostty.sh \
-         scripts/update-brewfile.sh scripts/secrets.sh tests/run.sh tests/lib.sh; do
+         scripts/update-brewfile.sh scripts/secrets.sh scripts/lib/defaults.sh \
+         tests/run.sh tests/lib.sh; do
   [ -f "$REPO_DIR/$f" ] || continue
   it "$f parses"
   ok bash -n "$REPO_DIR/$f"
@@ -151,5 +152,124 @@ if [ "$n" -gt 0 ]; then _pass; else _fail "no MonoLisa fonts installed"; fi
 it "is idempotent"
 in_fake_home "$FAKE2" /bin/bash "$REPO_DIR/scripts/finish.sh" > "$SCRATCH/finish2.log" 2>&1
 eq "0" "$?"
+
+###############################################################################
+section "Idempotent defaults"
+###############################################################################
+DOM="com.tilde.test.$$"
+# shellcheck source=scripts/lib/defaults.sh
+. "$REPO_DIR/scripts/lib/defaults.sh"
+
+it "writing a new value counts as changed"
+DEFAULTS_CHANGED=0; DEFAULTS_UNCHANGED=0
+defaults_set "$DOM" k1 int 7 >/dev/null
+eq "1" "$DEFAULTS_CHANGED"
+
+it "writing the same value again counts as unchanged"
+DEFAULTS_CHANGED=0; DEFAULTS_UNCHANGED=0
+defaults_set "$DOM" k1 int 7 >/dev/null
+eq "1" "$DEFAULTS_UNCHANGED"
+
+it "treats true, YES and 1 as the same boolean"
+defaults_set "$DOM" k2 bool true >/dev/null
+DEFAULTS_UNCHANGED=0
+defaults_set "$DOM" k2 bool YES >/dev/null
+defaults_set "$DOM" k2 bool 1 >/dev/null
+eq "2" "$DEFAULTS_UNCHANGED"
+
+it "compares strings exactly"
+defaults_set "$DOM" k3 string "a b" >/dev/null
+DEFAULTS_CHANGED=0
+defaults_set "$DOM" k3 string "a c" >/dev/null
+eq "1" "$DEFAULTS_CHANGED"
+
+it "check mode does not write anything"
+( export DEFAULTS_CHECK=1; defaults_set "$DOM" k4 int 99 >/dev/null )
+eq "" "$(defaults read "$DOM" k4 2>/dev/null)"
+
+it "run() executes normally but not in check mode"
+probe="$SCRATCH/run-probe"
+rm -f "$probe"
+run touch "$probe"
+ran_normally=no; [ -f "$probe" ] && ran_normally=yes
+rm -f "$probe"
+( export DEFAULTS_CHECK=1; run touch "$probe" >/dev/null )
+ran_in_check=no; [ -f "$probe" ] && ran_in_check=yes
+rm -f "$probe"
+if [ "$ran_normally" = yes ] && [ "$ran_in_check" = no ]; then
+  _pass
+else
+  _fail "normal=$ran_normally check=$ran_in_check"
+fi
+
+defaults delete "$DOM" >/dev/null 2>&1 || true
+
+it "macos --check is a genuine dry run (no writes, no sudo prompt)"
+MACOS_OUT="$SCRATCH/macos-check.log"
+bash "$REPO_DIR/scripts/macos" --check > "$MACOS_OUT" 2>&1
+macos_rc=$?
+if [ $macos_rc -eq 0 ] && ! grep -qiE "password is required|^  set " "$MACOS_OUT"; then
+  _pass
+else
+  _fail "rc=$macos_rc or it wrote/prompted"
+fi
+
+it "macos --check reports a summary"
+has "$MACOS_OUT" "dry run:"
+
+it "every defaults write in macos goes through the idempotent wrappers"
+stray="$(grep -cE '^(sudo )?defaults (-currentHost )?write ' "$REPO_DIR/scripts/macos" || true)"
+eq "0" "$stray"
+
+###############################################################################
+section "Secrets (sops + age)"
+###############################################################################
+SEC="$REPO_DIR/scripts/secrets.sh"
+
+it "secrets.sh reports status without a 1Password session"
+ok bash "$SEC" status
+
+it "secrets.sh refuses an unknown subcommand"
+no bash "$SEC" definitely-not-a-command
+
+# Everything below uses a throwaway age key and a throwaway ssh dir.
+SBOX="$SCRATCH/secrets"
+mkdir -p "$SBOX/ssh"
+age-keygen -o "$SBOX/age.txt" 2>/dev/null
+printf -- '-----BEGIN OPENSSH PRIVATE KEY-----\nSENTINEL-PRIVATE\n-----END OPENSSH PRIVATE KEY-----\n' > "$SBOX/ssh/arnor"
+printf 'ssh-ed25519 AAAATEST test@example.com\n' > "$SBOX/ssh/arnor.pub"
+chmod 600 "$SBOX/ssh/arnor"; chmod 644 "$SBOX/ssh/arnor.pub"
+
+sec() { env SOPS_AGE_KEY_FILE="$SBOX/age.txt" TILDE_SSH_DIR="$SBOX/ssh"             TILDE_SECRETS_FILE="$SBOX/sealed.enc.json" bash "$SEC" "$@"; }
+
+it "seals the ssh directory"
+ok sec seal
+
+it "the sealed file contains no plaintext key material"
+hasnt "$SBOX/sealed.enc.json" 'SENTINEL-PRIVATE'
+
+it "the sealed file still names which secrets it holds"
+has "$SBOX/sealed.enc.json" '"arnor"'
+
+it "unseals back to identical content"
+rm -rf "$SBOX/ssh"
+sec unseal >/dev/null 2>&1
+has "$SBOX/ssh/arnor" 'SENTINEL-PRIVATE'
+
+it "restores 600 on the private key"
+eq "600" "$(stat -f '%OLp' "$SBOX/ssh/arnor" 2>/dev/null)"
+
+it "restores 644 on the public key"
+eq "644" "$(stat -f '%OLp' "$SBOX/ssh/arnor.pub" 2>/dev/null)"
+
+it "refuses to unseal with the wrong age key"
+age-keygen -o "$SBOX/wrong.txt" 2>/dev/null
+no env SOPS_AGE_KEY_FILE="$SBOX/wrong.txt" TILDE_SSH_DIR="$SBOX/ssh"        TILDE_SECRETS_FILE="$SBOX/sealed.enc.json" bash "$SEC" unseal
+
+it "refuses to unseal with no age key at all"
+no env SOPS_AGE_KEY_FILE="$SBOX/nonexistent.txt" TILDE_SSH_DIR="$SBOX/ssh"        TILDE_SECRETS_FILE="$SBOX/sealed.enc.json" bash "$SEC" unseal
+
+it ".sops.yaml points at a real age recipient"
+has "$REPO_DIR/.sops.yaml" 'age1'
 
 summary

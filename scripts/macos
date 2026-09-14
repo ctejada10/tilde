@@ -4,11 +4,20 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Ask for the administrator password upfront
-sudo -v
+# --check reports what would change without writing anything.
+if [ "${1:-}" = "--check" ] || [ "${1:-}" = "-n" ]; then
+  export DEFAULTS_CHECK=1
+fi
 
-# Keep-alive: update existing `sudo` time stamp until `osxprep.sh` has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+# shellcheck source=scripts/lib/defaults.sh
+. "$SCRIPT_DIR/lib/defaults.sh"
+
+# Ask for the administrator password upfront (not needed for a dry run)
+if [ "${DEFAULTS_CHECK:-0}" != "1" ]; then
+  sudo -v
+  # Keep-alive: refresh the sudo timestamp until this script has finished
+  while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+fi
 
 # Step 1: Update the OS and Install Xcode Tools
 echo "------------------------------"
@@ -20,19 +29,23 @@ echo "------------------------------"
 
 echo "------------------------------"
 
-source "$SCRIPT_DIR/.brew"
-# Install oh-my-zsh without modifying .zshrc (stow manages that)
-RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [ "${DEFAULTS_CHECK:-0}" = "1" ]; then
+  echo "  would run  Homebrew install + brew bundle + oh-my-zsh install"
+else
+  source "$SCRIPT_DIR/.brew"
+  # Install oh-my-zsh without modifying .zshrc (stow manages that)
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# KEEP_ZSHRC only protects an *existing* .zshrc. On a fresh machine there is
-# none, so the installer drops its own template in place — which would then
-# make `stow zsh` fail with a conflict in phase 2. Remove the template.
-if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ] \
-   && grep -q "oh-my-zsh.sh" "$HOME/.zshrc" \
-   && ! grep -q "MNML_PROMPT" "$HOME/.zshrc"; then
-  echo "Removing the oh-my-zsh template ~/.zshrc so stow can link ours."
-  rm -f "$HOME/.zshrc"
+  # KEEP_ZSHRC only protects an *existing* .zshrc. On a fresh machine there is
+  # none, so the installer drops its own template in place — which would then
+  # make `stow zsh` fail with a conflict in phase 2. Remove the template.
+  if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ] \
+     && grep -q "oh-my-zsh.sh" "$HOME/.zshrc" \
+     && ! grep -q "MNML_PROMPT" "$HOME/.zshrc"; then
+    echo "Removing the oh-my-zsh template ~/.zshrc so stow can link ours."
+    rm -f "$HOME/.zshrc"
+  fi
 fi
 
 ###############################################################################
@@ -41,70 +54,69 @@ fi
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+run osascript -e 'tell application "System Preferences" to quit'
 
-# Ask for the administrator password upfront
-sudo -v
-
-# Keep-alive: update existing `sudo` time stamp until `.macos` has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+if [ "${DEFAULTS_CHECK:-0}" != "1" ]; then
+  sudo -v
+  while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+fi
 
 ###############################################################################
 # General UI/UX                                                               #
 ###############################################################################
 
 # Set computer name (as done via System Preferences → Sharing)
-sudo scutil --set HostName "arnor"
+run sudo scutil --set HostName "arnor"
 
 # Disable the sound effects on boot
 # sudo nvram SystemAudioVolume=" "
 
 # Set highlight color to my blue
-defaults write NSGlobalDomain AppleHighlightColor -string "0.1725490196 0.2862745098 0.4980392157"
+defaults_set NSGlobalDomain AppleHighlightColor string "0.1725490196 0.2862745098 0.4980392157"
 
 # Set sidebar icon size to small
-defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
+defaults_set NSGlobalDomain NSTableViewDefaultSizeMode int 1
 
 # Scrollbars only when scrolling
-defaults write NSGlobalDomain AppleShowScrollBars -string "WhenScrolling"
+defaults_set NSGlobalDomain AppleShowScrollBars string "WhenScrolling"
 # Possible values: `WhenScrolling`, `Automatic` and `Always`
 
 # Save to disk (not to iCloud) by default
 # defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 
 # Automatically quit printer app once the print jobs complete
-defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+defaults_set com.apple.print.PrintingPrefs "Quit When Finished" bool true
 
 # Disable the “Are you sure you want to open this application?” dialog
-defaults write com.apple.LaunchServices LSQuarantine -bool false
+defaults_set com.apple.LaunchServices LSQuarantine bool false
 
 # Remove duplicates in the “Open With” menu (also see `lscleanup` alias)
-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
+run /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
 
 # Disable Resume system-wide
-defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
+defaults_set com.apple.systempreferences NSQuitAlwaysKeepsWindows bool false
 
 # Disable automatic capitalization as it’s annoying when typing code
-defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+defaults_set NSGlobalDomain NSAutomaticCapitalizationEnabled bool false
 
 # Disable automatic period substitution as it’s annoying when typing code
-defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+defaults_set NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled bool false
 
 # Disable smart quotes as they’re annoying when typing code
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults_set NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled bool false
 
 # Tighten menu bar status item spacing
-defaults -currentHost write -globalDomain NSStatusItemSpacing -int 6
+defaults_set_host -globalDomain NSStatusItemSpacing int 6
 
 ###############################################################################
 # Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
 ###############################################################################
 
 # Disable “natural” (Lion-style) scrolling
-defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+defaults_set NSGlobalDomain com.apple.swipescrolldirection bool false
 
 # Increase sound quality for Bluetooth headphones/headsets
-defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+defaults_set com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" int 40
 
 # Enable full keyboard access for all controls
 # (e.g. enable Tab in modal dialogs)
@@ -117,10 +129,10 @@ defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int
 # defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 
 # Disable press-and-hold for keys in favor of key repeat
-defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+defaults_set NSGlobalDomain ApplePressAndHoldEnabled bool false
 
 # Set the timezone; see `sudo systemsetup -listtimezones` for other values
-sudo systemsetup -settimezone "Europe/Copenhagen" > /dev/null
+run sudo systemsetup -settimezone "Europe/Copenhagen" > /dev/null
 
 # Stop iTunes from responding to the keyboard media keys
 # launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
@@ -130,49 +142,49 @@ sudo systemsetup -settimezone "Europe/Copenhagen" > /dev/null
 ###############################################################################
 
 # Enable lid wakeup
-sudo pmset -a lidwake 1
+run sudo pmset -a lidwake 1
 
 # Restart automatically on power loss
-sudo pmset -a autorestart 1
+run sudo pmset -a autorestart 1
 
 # Restart automatically if the computer freezes
-sudo systemsetup -setrestartfreeze on
+run sudo systemsetup -setrestartfreeze on
 
 # Sleep the display after 15 minutes
-sudo pmset -a displaysleep 15
+run sudo pmset -a displaysleep 15
 
 # Disable machine sleep while charging
-sudo pmset -c sleep 0
+run sudo pmset -c sleep 0
 
 # Set machine sleep to 5 minutes on battery
-sudo pmset -b sleep 5
+run sudo pmset -b sleep 5
 
 # Set standby delay to 24 hours (default is 1 hour)
-sudo pmset -a standbydelay 86400
+run sudo pmset -a standbydelay 86400
 
 # Never go into computer sleep mode
-sudo systemsetup -setcomputersleep Off > /dev/null
+run sudo systemsetup -setcomputersleep Off > /dev/null
 
 # Hibernation mode
 # 0: Disable hibernation (speeds up entering sleep mode)
 # 3: Copy RAM to disk so the system state can still be restored in case of a
 #    power failure.
-sudo pmset -a hibernatemode 0
+run sudo pmset -a hibernatemode 0
 
 # Remove the sleep image file to save disk space
-sudo rm /private/var/vm/sleepimage
+run sudo rm /private/var/vm/sleepimage
 # Create a zero-byte file instead…
-sudo touch /private/var/vm/sleepimage
+run sudo touch /private/var/vm/sleepimage
 # …and make sure it can’t be rewritten
-sudo chflags uchg /private/var/vm/sleepimage
+run sudo chflags uchg /private/var/vm/sleepimage
 
 ###############################################################################
 # Screen                                                                      #
 ###############################################################################
 
 # Require password immediately after sleep or screen saver begins
-defaults write com.apple.screensaver askForPassword -int 1
-defaults write com.apple.screensaver askForPasswordDelay -int 0
+defaults_set com.apple.screensaver askForPassword int 1
+defaults_set com.apple.screensaver askForPasswordDelay int 0
 
 # Save screenshots to iCloud Drive. macOS silently ignores this if the folder
 # does not exist, and iCloud Drive only appears once you have signed in — so
@@ -188,17 +200,17 @@ else
 fi
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
-defaults write com.apple.screencapture type -string "png"
+defaults_set com.apple.screencapture type string "png"
 
 # Disable shadow in screenshots
-defaults write com.apple.screencapture disable-shadow -bool true
+defaults_set com.apple.screencapture disable-shadow bool true
 
 # Enable subpixel font rendering on non-Apple LCDs
 # Reference: https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
-defaults write NSGlobalDomain AppleFontSmoothing -int 1
+defaults_set NSGlobalDomain AppleFontSmoothing int 1
 
 # Enable HiDPI display modes (requires restart)
-sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
+defaults_set_sudo /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled bool true
 
 ###############################################################################
 # Finder                                                                      #
@@ -206,8 +218,8 @@ sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutio
 
 # Set Home as the default location for new Finder windows
 # For other paths, use `PfLo` and `file:///full/path/here/`
-defaults write com.apple.finder NewWindowTarget -string "PfDe"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
+defaults_set com.apple.finder NewWindowTarget string "PfDe"
+defaults_set com.apple.finder NewWindowTargetPath string "file://${HOME}/"
 
 # Finder: show all filename extensions
 # defaults write NSGlobalDomain AppleShowAllExtensions -bool true
@@ -216,222 +228,222 @@ defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
 # defaults write com.apple.finder ShowStatusBar -bool true
 
 # Keep folders on top when sorting by name
-defaults write com.apple.finder _FXSortFoldersFirst -bool true
+defaults_set com.apple.finder _FXSortFoldersFirst bool true
 
 # When performing a search, search the current folder by default
-defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+defaults_set com.apple.finder FXDefaultSearchScope string "SCcf"
 
 # Disable the warning when changing a file extension
-defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+defaults_set com.apple.finder FXEnableExtensionChangeWarning bool false
 
 # Avoid creating .DS_Store files on network or USB volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+defaults_set com.apple.desktopservices DSDontWriteNetworkStores bool true
+defaults_set com.apple.desktopservices DSDontWriteUSBStores bool true
 
 # Disable disk image verification
-defaults write com.apple.frameworks.diskimages skip-verify -bool true
-defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
-defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
+defaults_set com.apple.frameworks.diskimages skip-verify bool true
+defaults_set com.apple.frameworks.diskimages skip-verify-locked bool true
+defaults_set com.apple.frameworks.diskimages skip-verify-remote bool true
 
 # Show item info near icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
 
 # Show item info to the bottom of the icons on the desktop
-/usr/libexec/PlistBuddy -c "Set DesktopViewSettings:IconViewSettings:labelOnBottom true" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set DesktopViewSettings:IconViewSettings:labelOnBottom true" ~/Library/Preferences/com.apple.finder.plist
 
 # Enable snap-to-grid for icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 
 # Increase grid spacing for icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
 
 # Increase the size of icons on the desktop and in other icon views
-/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
+run /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
 
 # Disable the warning before emptying the Trash
-defaults write com.apple.finder WarnOnEmptyTrash -bool false
+defaults_set com.apple.finder WarnOnEmptyTrash bool false
 
 ###############################################################################
 # Dock, Dashboard, and hot corners                                            #
 ###############################################################################
 
 # Set the icon size of Dock items to 36 pixels
-defaults write com.apple.dock tilesize -int 36
+defaults_set com.apple.dock tilesize int 36
 
 # Minimize windows into their application’s icon
-defaults write com.apple.dock minimize-to-application -bool true
+defaults_set com.apple.dock minimize-to-application bool true
 
 # Show indicator lights for open applications in the Dock
-defaults write com.apple.dock show-process-indicators -bool true
+defaults_set com.apple.dock show-process-indicators bool true
 
 # Disable Dashboard
-defaults write com.apple.dashboard mcx-disabled -bool true
+defaults_set com.apple.dashboard mcx-disabled bool true
 
 # Don’t show Dashboard as a Space
-defaults write com.apple.dock dashboard-in-overlay -bool true
+defaults_set com.apple.dock dashboard-in-overlay bool true
 
 # Don’t automatically rearrange Spaces based on most recent use
-defaults write com.apple.dock mru-spaces -bool false
+defaults_set com.apple.dock mru-spaces bool false
 
 # Make Dock icons of hidden applications translucent
-defaults write com.apple.dock showhidden -bool true
+defaults_set com.apple.dock showhidden bool true
 
 # Don’t show recent applications in Dock
-defaults write com.apple.dock show-recents -bool false
+defaults_set com.apple.dock show-recents bool false
 
 # Reset Launchpad, but keep the desktop wallpaper intact
-find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
+run find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
 
 ###############################################################################
 # Safari & WebKit                                                             #
 ###############################################################################
 
 # Privacy: don’t send search queries to Apple
-defaults write com.apple.Safari UniversalSearchEnabled -bool false
-defaults write com.apple.Safari SuppressSearchSuggestions -bool true
+defaults_set com.apple.Safari UniversalSearchEnabled bool false
+defaults_set com.apple.Safari SuppressSearchSuggestions bool true
 
 # Prevent Safari from opening ‘safe’ files automatically after downloading
-defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+defaults_set com.apple.Safari AutoOpenSafeDownloads bool false
 
 # Hide Safari’s bookmarks bar by default
-defaults write com.apple.Safari ShowFavoritesBar -bool false
+defaults_set com.apple.Safari ShowFavoritesBar bool false
 
 # Hide Safari’s sidebar in Top Sites
-defaults write com.apple.Safari ShowSidebarInTopSites -bool false
+defaults_set com.apple.Safari ShowSidebarInTopSites bool false
 
 # Disable Safari’s thumbnail cache for History and Top Sites
-defaults write com.apple.Safari DebugSnapshotsUpdatePolicy -int 2
+defaults_set com.apple.Safari DebugSnapshotsUpdatePolicy int 2
 
 # Make Safari’s search banners default to Contains instead of Starts With
-defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
+defaults_set com.apple.Safari FindOnPageMatchesWordStartsOnly bool false
 
 # Remove useless icons from Safari’s bookmarks bar
-defaults write com.apple.Safari ProxiesInBookmarksBar "()"
+defaults_always defaults write com.apple.Safari ProxiesInBookmarksBar "()"
 
 # Add a context menu item for showing the Web Inspector in web views
-defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
+defaults_set NSGlobalDomain WebKitDeveloperExtras bool true
 
 # Enable continuous spellchecking
-defaults write com.apple.Safari WebContinuousSpellCheckingEnabled -bool true
+defaults_set com.apple.Safari WebContinuousSpellCheckingEnabled bool true
 # Disable auto-correct
-defaults write com.apple.Safari WebAutomaticSpellingCorrectionEnabled -bool false
+defaults_set com.apple.Safari WebAutomaticSpellingCorrectionEnabled bool false
 
 # Disable AutoFill
-defaults write com.apple.Safari AutoFillFromAddressBook -bool false
-defaults write com.apple.Safari AutoFillPasswords -bool false
-defaults write com.apple.Safari AutoFillCreditCardData -bool false
-defaults write com.apple.Safari AutoFillMiscellaneousForms -bool false
+defaults_set com.apple.Safari AutoFillFromAddressBook bool false
+defaults_set com.apple.Safari AutoFillPasswords bool false
+defaults_set com.apple.Safari AutoFillCreditCardData bool false
+defaults_set com.apple.Safari AutoFillMiscellaneousForms bool false
 
 # Warn about fraudulent websites
-defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
+defaults_set com.apple.Safari WarnAboutFraudulentWebsites bool true
 
 # Disable Java
-defaults write com.apple.Safari WebKitJavaEnabled -bool false
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabled -bool false
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabledForLocalFiles -bool false
+defaults_set com.apple.Safari WebKitJavaEnabled bool false
+defaults_set com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabled bool false
+defaults_set com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabledForLocalFiles bool false
 
 # Block pop-up windows
-defaults write com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically -bool false
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false
+defaults_set com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically bool false
+defaults_set com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically bool false
 
 # Enable “Do Not Track”
-defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
+defaults_set com.apple.Safari SendDoNotTrackHTTPHeader bool true
 
 # Update extensions automatically
-defaults write com.apple.Safari InstallExtensionUpdatesAutomatically -bool true
+defaults_set com.apple.Safari InstallExtensionUpdatesAutomatically bool true
 
 ###############################################################################
 # Time Machine                                                                #
 ###############################################################################
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
-defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+defaults_set com.apple.TimeMachine DoNotOfferNewDisksForBackup bool true
 
 # Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
+hash tmutil &> /dev/null && run sudo tmutil disablelocal
 
 ###############################################################################
 # Activity Monitor                                                            #
 ###############################################################################
 
 # Show the main window when launching Activity Monitor
-defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
+defaults_set com.apple.ActivityMonitor OpenMainWindow bool true
 
 # Visualize CPU usage in the Activity Monitor Dock icon
 # defaults write com.apple.ActivityMonitor IconType -int 5
 
 # Show all processes in Activity Monitor
-defaults write com.apple.ActivityMonitor ShowCategory -int 0
+defaults_set com.apple.ActivityMonitor ShowCategory int 0
 
 # Sort Activity Monitor results by CPU usage
-defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
-defaults write com.apple.ActivityMonitor SortDirection -int 0
+defaults_set com.apple.ActivityMonitor SortColumn string "CPUUsage"
+defaults_set com.apple.ActivityMonitor SortDirection int 0
 
 ###############################################################################
 # Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
 ###############################################################################
 
 # Use plain text mode for new TextEdit documents
-defaults write com.apple.TextEdit RichText -int 0
+defaults_set com.apple.TextEdit RichText int 0
 # Open and save files as UTF-8 in TextEdit
-defaults write com.apple.TextEdit PlainTextEncoding -int 4
-defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
+defaults_set com.apple.TextEdit PlainTextEncoding int 4
+defaults_set com.apple.TextEdit PlainTextEncodingForWrite int 4
 
 # Auto-play videos when opened with QuickTime Player
-defaults write com.apple.QuickTimePlayerX MGPlayMovieOnOpen -bool true
+defaults_set com.apple.QuickTimePlayerX MGPlayMovieOnOpen bool true
 
 ###############################################################################
 # Mac App Store                                                               #
 ###############################################################################
 
 # Enable the automatic update check
-defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+defaults_set com.apple.SoftwareUpdate AutomaticCheckEnabled bool true
 
 # Check for software updates daily, not just once per week
-defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
+defaults_set com.apple.SoftwareUpdate ScheduleFrequency int 1
 
 # Download newly available updates in background
-defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
+defaults_set com.apple.SoftwareUpdate AutomaticDownload int 1
 
 # Install System data files & security updates
-defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
+defaults_set com.apple.SoftwareUpdate CriticalUpdateInstall int 1
 
 # Automatically download apps purchased on other Macs
-defaults write com.apple.SoftwareUpdate ConfigDataInstall -int 1
+defaults_set com.apple.SoftwareUpdate ConfigDataInstall int 1
 
 # Turn on app auto-update
-defaults write com.apple.commerce AutoUpdate -bool true
+defaults_set com.apple.commerce AutoUpdate bool true
 
 # Allow the App Store to reboot machine on macOS updates
-defaults write com.apple.commerce AutoUpdateRestartRequired -bool true
+defaults_set com.apple.commerce AutoUpdateRestartRequired bool true
 
 ###############################################################################
 # Photos                                                                      #
 ###############################################################################
 
 # Prevent Photos from opening automatically when devices are plugged in
-defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+defaults_set_host com.apple.ImageCapture disableHotPlug bool true
 
 ###############################################################################
 # Messages                                                                    #
 ###############################################################################
 
 # Disable automatic emoji substitution (i.e. use plain text smileys)
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
+defaults_always defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
 
 # Disable smart quotes as it’s annoying for messages that contain code
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
+defaults_always defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
 # Disable continuous spell checking
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
+defaults_always defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
 
 ###############################################################################
 # Hide unused directories from ~                                              #
@@ -445,7 +457,7 @@ done
 # Downloads structure                                                         #
 ###############################################################################
 
-mkdir -p ~/Downloads/Documents ~/Downloads/Media/Images ~/Downloads/Media/Videos
+run mkdir -p ~/Downloads/Documents ~/Downloads/Media/Images ~/Downloads/Media/Videos
 
 ###############################################################################
 # Kill affected applications                                                  #
@@ -454,6 +466,9 @@ mkdir -p ~/Downloads/Documents ~/Downloads/Media/Images ~/Downloads/Media/Videos
 # Terminal, so killing it kills the script — that is why everything after this
 # block silently failed to run on the previous install.
 
+if [ "${DEFAULTS_CHECK:-0}" = "1" ]; then
+	echo "  would run  killall on the affected apps"
+else
 for app in "Activity Monitor" \
 	"Address Book" \
 	"Calendar" \
@@ -477,6 +492,9 @@ for app in "Activity Monitor" \
 	"iCal"; do
 	killall "${app}" &> /dev/null
 done
+fi
 
+
+defaults_summary
 
 echo "Done. Note that some of these changes require a logout/restart to take effect."
