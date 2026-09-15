@@ -108,6 +108,23 @@ if [ -d "$REPO_DIR/assets/monolisa-font" ]; then
 fi
 
 ###############################################################################
+# Application settings                                                        #
+###############################################################################
+# This runs here, not in phase 1, because an app has to exist before its
+# preferences can be written — phase 1's brew bundle has put them in place by
+# now. Anything still missing or currently running is skipped rather than
+# clobbered, and the step is safe to run again afterwards.
+if [ -f "$REPO_DIR/secrets/app-prefs.enc.json" ]; then
+  echo ""
+  echo "Restoring application settings..."
+  if ! bash "$SCRIPT_DIR/app-prefs.sh" restore; then
+    echo "  Could not restore application settings."
+    echo "  Run '$SCRIPT_DIR/app-prefs.sh restore' once the apps are installed."
+  fi
+  echo ""
+fi
+
+###############################################################################
 # Sanity check                                                                #
 ###############################################################################
 echo ""

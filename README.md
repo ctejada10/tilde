@@ -121,7 +121,11 @@ In order, it:
 7. Links the Ghostty config into `~/Library/Application Support/`, so Ghostty
    finds it whichever of its two config locations it prefers.
 8. Installs the MonoLisa fonts into `~/Library/Fonts`.
-9. Verifies every link and prints `ok` or `MISSING` for each.
+9. **Restores application settings** for the apps that sync nothing of their
+   own. Anything not yet installed, or currently running, is skipped rather
+   than clobbered — re-run `scripts/app-prefs.sh restore` afterwards to pick
+   those up.
+10. Verifies every link and prints `ok` or `MISSING` for each.
 
 **It exits non-zero if anything is missing.** A setup that looks fine but has
 no SSH keys is exactly the failure this catches, so read the last few lines.
@@ -223,6 +227,31 @@ path.
 
 Set `OP_SERVICE_ACCOUNT_TOKEN` to skip the interactive path entirely, for a
 scripted or CI rebuild.
+
+## Application settings
+
+Most apps sync their own settings through an account or iCloud. A handful keep
+everything locally, and those are captured here:
+
+```sh
+scripts/app-prefs.sh status     # what is captured, and what is installed
+scripts/app-prefs.sh capture    # read this machine's settings into secrets/
+scripts/app-prefs.sh restore    # write them onto a new machine
+```
+
+Preference domains are exported with `defaults export` rather than symlinked,
+because `cfprefsd` writes preference files atomically and would replace a
+symlink with a real file. Stow is the wrong tool for plists.
+
+The store is encrypted with the same age key as the SSH keys, because several
+of these carry paid licence keys — AlDente's `paddleLicense`, CleanShot's
+`activationKey`, Lunar's `apiKey` — and this repo is public.
+
+**Restore refuses to touch an app that is missing or running.** A missing app
+means Homebrew has not installed it yet, and a preference file written before
+the app exists can be discarded on first launch. A running app is worse:
+`cfprefsd` caches each domain, and the live app can flush its cached copy back
+over the import, silently undoing it. Both cases are skips, not failures.
 
 ## Checking what the macOS script would do
 

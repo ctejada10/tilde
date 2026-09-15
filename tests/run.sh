@@ -16,7 +16,8 @@ section "Lint"
 ###############################################################################
 for f in setup.sh scripts/macos scripts/ubuntu scripts/.brew scripts/.stow \
          scripts/.apt scripts/finish.sh scripts/ghostty.sh \
-         scripts/update-brewfile.sh scripts/secrets.sh scripts/lib/defaults.sh \
+         scripts/update-brewfile.sh scripts/secrets.sh scripts/app-prefs.sh \
+         scripts/lib/defaults.sh \
          tests/run.sh tests/lib.sh; do
   [ -f "$REPO_DIR/$f" ] || continue
   it "$f parses"
@@ -361,6 +362,30 @@ case "$fb" in
   *"falling back to 1Password"*) _pass ;;
   *) _fail "did not fall through: $(printf '%s' "$fb" | tail -1)" ;;
 esac
+
+it "app-prefs reports status without a store"
+ok env TILDE_APP_PREFS="$SBOX/nothing.enc.json" bash "$REPO_DIR/scripts/app-prefs.sh" status
+
+it "app-prefs refuses an unknown subcommand"
+no bash "$REPO_DIR/scripts/app-prefs.sh" not-a-command
+
+it "app-prefs refuses to restore without an age key"
+no env SOPS_AGE_KEY_FILE="$SBOX/absent.txt" TILDE_APP_PREFS="$REPO_DIR/secrets/app-prefs.enc.json" \
+   bash "$REPO_DIR/scripts/app-prefs.sh" restore
+
+it "the captured app settings are encrypted, not plaintext"
+if [ -f "$REPO_DIR/secrets/app-prefs.enc.json" ]; then
+  has "$REPO_DIR/secrets/app-prefs.enc.json" 'ENC[AES256_GCM'
+else
+  _pass
+fi
+
+it "no licence key leaks into the captured store"
+if [ -f "$REPO_DIR/secrets/app-prefs.enc.json" ]; then
+  hasnt "$REPO_DIR/secrets/app-prefs.enc.json" 'paddleLicense|activationKey|apiKey'
+else
+  _pass
+fi
 
 it "no plaintext private key material is tracked in git"
 # Pattern assembled from fragments so this file does not match itself.
